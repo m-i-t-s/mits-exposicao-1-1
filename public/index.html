@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ebebeb">
+  <meta name="description" content="1:1. Exposição com curadoria de Lara Maia, na MITS Galeria. Consulte as obras e sua localização.">
+  <title>1:1 — MITS Galeria</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <main id="app">
+    <section id="home" class="screen home-screen" aria-labelledby="exhibition-title">
+      <div class="intro">
+        <h1 id="exhibition-title">1:1</h1>
+        <p class="curator" id="home-curator">Curadoria de Lara Maia</p>
+        <p class="artists" id="home-artists">Beatriz Lindenberg<br>Fyodor Pavlov-Andreevich<br>Aline Setton</p>
+      </div>
+      <div class="hero-art" aria-label="Ilustrações de figuras humanas amarelas em diferentes posturas">
+        <img class="figure figure-1" src="/assets/corpo-1.png" alt="Figura humana em flexão" draggable="false">
+        <img class="figure figure-2" src="/assets/corpo-2.png" alt="Figura humana suspensa" draggable="false">
+        <img class="figure figure-3" src="/assets/corpo-3.png" alt="Figura humana reclinada" draggable="false">
+        <button id="enter-gallery" class="hero-next" title="Explorar a exposição" aria-label="Explorar obras e planta da exposição">
+          <svg viewBox="0 0 80 130" aria-hidden="true"><path d="M6 7 69 65 6 123"/></svg>
+        </button>
+      </div>
+      <div class="home-bottom">
+        <div class="home-brand">
+          <a class="brand brand-home" href="#inicio" aria-label="MITS Galeria, início"><img src="/assets/logo-mits.png" alt="MITS"></a>
+          <button class="icon-button theme-switch" aria-label="Ativar modo noturno" title="Alternar modo claro e noturno">
+            <svg class="moon-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M25.5 23.7A12.4 12.4 0 0 1 8.3 6.5 12.3 12.3 0 1 0 25.5 23.7Z"/></svg>
+            <svg class="sun-icon" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="7"/><path d="M16 2v6M16 24v6M2 16h6M24 16h6M6 6l4.3 4.3M21.7 21.7 26 26M26 6l-4.3 4.3M10.3 21.7 6 26"/></svg>
+          </button>
+        </div>
+        <button class="icon-button admin-trigger" aria-label="Acesso restrito da equipe" title="Acesso restrito">
+          <svg viewBox="0 0 34 36" aria-hidden="true"><circle cx="17" cy="10" r="7"/><path d="M3 33v-3a14 14 0 0 1 28 0v3Z"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <section id="gallery" class="screen gallery-screen" aria-label="Obras da exposição" hidden>
+      <div class="details-panel">
+        <div class="work-number" id="work-number">1</div>
+        <div class="work-info" aria-live="polite">
+          <h2 id="work-artist">Nome artista</h2>
+          <div class="work-meta">
+            <p id="work-title">Nome obra</p>
+            <p id="work-year">Ano obra</p>
+          </div>
+          <div class="work-material">
+            <p id="work-technique">Técnica obra</p>
+            <p id="work-dimensions">Dimensões obra</p>
+          </div>
+          <div><span id="work-status" class="work-status">Disponível</span></div>
+        </div>
+        <div class="gallery-actions">
+          <button class="nav-button" id="previous-work" aria-label="Obra anterior" title="Obra anterior">
+            <svg viewBox="0 0 40 52" aria-hidden="true"><path d="M30 5 10 26l20 21"/></svg>
+          </button>
+          <button class="contact-button" id="contact-button">CONTATO</button>
+          <button class="nav-button" id="next-work" aria-label="Próxima obra" title="Próxima obra">
+            <svg viewBox="0 0 40 52" aria-hidden="true"><path d="m10 5 20 21-20 21"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="image-panel">
+        <div class="work-image-frame" id="image-frame">
+          <img id="work-image" alt="" hidden>
+          <div id="work-image-empty" class="work-image-empty" aria-label="Imagem da obra ainda não cadastrada"></div>
+        </div>
+      </div>
+
+      <div class="map-panel">
+        <div class="gallery-top-actions">
+          <button class="icon-button theme-switch" aria-label="Alternar modo noturno" title="Alternar modo claro e noturno">
+            <svg class="moon-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M25.5 23.7A12.4 12.4 0 0 1 8.3 6.5 12.3 12.3 0 1 0 25.5 23.7Z"/></svg>
+            <svg class="sun-icon" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="7"/><path d="M16 2v6M16 24v6M2 16h6M24 16h6M6 6l4.3 4.3M21.7 21.7 26 26M26 6l-4.3 4.3M10.3 21.7 6 26"/></svg>
+          </button>
+          <button class="icon-button admin-trigger" aria-label="Acesso restrito" title="Acesso restrito">
+            <svg viewBox="0 0 34 36" aria-hidden="true"><circle cx="17" cy="10" r="7"/><path d="M3 33v-3a14 14 0 0 1 28 0v3Z"/></svg>
+          </button>
+          <button class="brand-symbol" id="back-home" title="Voltar ao início" aria-label="Voltar à apresentação da exposição"><img src="/assets/logo-m.png" alt=""></button>
+        </div>
+        <div class="plan-wrapper">
+          <object id="plan-vector" data="/assets/planta.svg" type="image/svg+xml" class="plan-image" aria-label="Planta vetorial da galeria com dez posições numeradas">Planta da galeria em SVG</object>
+          <div class="plan-hotspots" id="plan-hotspots" aria-label="Selecionar obra pela localização na planta"></div>
+        </div>
+        <p class="map-hint">Selecione um número na planta</p>
+      </div>
+      <button class="back-link" id="gallery-back">← Voltar ao início</button>
+    </section>
+  </main>
+
+  <div id="modal-backdrop" class="modal-backdrop" hidden>
+    <div id="login-dialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="login-title" hidden>
+      <button type="button" class="dialog-close" data-close-dialog aria-label="Fechar">×</button>
+      <p class="eyebrow">MITS / EQUIPE</p>
+      <h2 id="login-title">Acesso restrito</h2>
+      <p>Entre com a senha da galeria para editar as fichas e fotografias das obras.</p>
+      <form id="login-form">
+        <label for="password">Senha</label>
+        <input id="password" type="password" name="password" autocomplete="current-password" required>
+        <p class="form-error" id="login-error" role="alert" hidden></p>
+        <button class="primary-action" type="submit">ENTRAR</button>
+      </form>
+    </div>
+
+    <div id="editor-dialog" class="dialog editor-dialog" role="dialog" aria-modal="true" aria-labelledby="editor-title" hidden>
+      <button type="button" class="dialog-close" data-close-dialog aria-label="Fechar">×</button>
+      <p class="eyebrow">MITS / ADMINISTRAÇÃO</p>
+      <div class="editor-title-line"><h2 id="editor-title">Editar exposição</h2><button type="button" class="subtle-button" id="logout">Sair</button></div>
+      <div class="admin-tabs" role="tablist" aria-label="Área de edição">
+        <button id="tab-work" type="button" role="tab" aria-selected="true">OBRA</button>
+        <button id="tab-settings" type="button" role="tab" aria-selected="false">EXPOSIÇÃO</button>
+      </div>
+      <form id="edit-work-form">
+        <div class="form-row">
+          <label for="edit-position">Posição na planta<select name="id" id="edit-position"></select></label>
+          <label for="edit-status">Status<select name="status" id="edit-status"><option>Disponível</option><option>Reservada</option><option>Vendida</option><option>Indisponível</option></select></label>
+        </div>
+        <label for="edit-artist">Artista<input name="artist" id="edit-artist" maxlength="180" required></label>
+        <label for="edit-title">Título da obra<input name="title" id="edit-title" maxlength="240" required></label>
+        <div class="form-row"><label for="edit-year">Ano<input name="year" id="edit-year" maxlength="80"></label><label for="edit-dimensions">Dimensões<input name="dimensions" id="edit-dimensions" maxlength="200"></label></div>
+        <label for="edit-technique">Técnica<input name="technique" id="edit-technique" maxlength="400"></label>
+        <label for="edit-image">Imagem da obra (JPG, PNG ou WebP, até 5 MB)<input name="image" id="edit-image" type="file" accept="image/jpeg,image/png,image/webp"></label>
+        <p class="note" id="image-admin-note">A imagem atual será mantida se você não selecionar outro arquivo.</p>
+        <label class="checkbox-line"><input type="checkbox" name="removeImage" id="edit-remove-image"> Remover imagem atual</label>
+        <button class="primary-action" type="submit" id="save-work">SALVAR OBRA</button>
+      </form>
+      <form id="edit-settings-form" hidden>
+        <label for="edit-curator">Texto de curadoria<input id="edit-curator" name="curator" maxlength="240"></label>
+        <label for="edit-artists">Artistas participantes (um por linha)<textarea id="edit-artists" name="artists" rows="4" maxlength="1500"></textarea></label>
+        <label for="edit-email">E-mail para o botão CONTATO<input id="edit-email" name="contactEmail" type="email" placeholder="galeria@dominio.com" maxlength="240"></label>
+        <p class="note">As alterações aparecerão para os visitantes após salvar.</p>
+        <button class="primary-action" type="submit" id="save-settings">SALVAR EXPOSIÇÃO</button>
+      </form>
+      <p id="editor-message" class="editor-message" role="status" aria-live="polite"></p>
+    </div>
+
+    <div id="contact-dialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="contact-title" hidden>
+      <button type="button" class="dialog-close" data-close-dialog aria-label="Fechar">×</button>
+      <p class="eyebrow">MITS GALERIA</p>
+      <h2 id="contact-title">Contato</h2>
+      <p id="contact-description">Entre em contato sobre a obra selecionada.</p>
+      <a href="#" id="contact-email-link" class="primary-action">ENVIAR E-MAIL</a>
+      <p class="note" id="contact-not-configured" hidden>A galeria ainda não cadastrou o e-mail de atendimento. Configure-o pelo acesso restrito.</p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
