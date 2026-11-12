@@ -1,83 +1,50 @@
-# MITS Galeria — 1:1
+# MITS / 1:1 — site com os SVGs originais da exposição
 
-Site de exposição baseado no layout WEBP fornecido. Front-end responsivo em HTML/CSS/JavaScript, mapa gráfico vetorial SVG e painel de edição protegido por senha. Pensado para hospedagem por repositório GitHub com deploy no Netlify.
+Esta versão utiliza diretamente os **três SVGs enviados pela designer** como composição integral. Não há reconstrução em CSS do desenho, da planta gráfica, dos corpos, da marca ou dos botões. Apenas os campos de obra e as áreas transparentes de interação mudam dinamicamente.
 
-## O que funciona
+## Arquivos visuais usados
 
-- Apresentação inicial 1:1, ilustrações amarelas, textos dos artistas e marca MITS.
-- Navegação entre 10 obras, por setas ou por números no mapa.
-- Ficha da obra com artista, título, ano, técnica, dimensões, status e fotografia.
-- Botão **CONTATO**, que abre e-mail com assunto e identificação da obra quando o e-mail estiver cadastrado.
-- Alternância entre modos claro e escuro e layout adaptado a celular.
-- Painel de equipe com senha, acessível pelo ícone de perfil.
-- Atualização de status (Disponível, Reservada, Vendida, Indisponível), foto e dados de cada obra, além de curadoria, lista de artistas e e-mail de contato.
-- Salvamento persistente no Netlify Blobs, sem precisar publicar novamente a cada mudança.
+- `public/assets/expografia-capa-original.svg` — capa original.
+- `public/assets/expografia-ficha-disponivel-original.svg` — ficha original com estado "Disponível".
+- `public/assets/expografia-ficha-indisponivel-original.svg` — ficha original com estado "Indisponível".
 
-## Mapa da exposição — arte final
+Ambos os SVGs de ficha possuem o **mapa gráfico definitivo** à direita. Seus números funcionam como seletores das posições 1 a 10; não existe uma planta técnica a ser adicionada ou redesenhada. A fotografia enviada para uma posição aparece dentro do retângulo preto central da ficha e o número correspondente recebe destaque amarelo.
 
-**O mapa existente em `public/assets/planta.svg` é a arte final aprovada para esta interface.** É um desenho esquemático e gráfico da exposição, não uma planta arquitetônica técnica. Preservar sua geometria, proporções e linguagem visual. Não precisa ser substituído por uma planta mais detalhada.
+## Fonte: PP Neue Montreal
 
-- O mapa exibe dez números, correspondentes às dez posições das obras. Clique em qualquer número para navegar.
-- O número da obra selecionada recebe destaque amarelo.
-- O **grande retângulo preto no centro da ficha** é o espaço da fotografia da obra. Ao cadastrar a imagem no painel, ela substitui o preenchimento preto desse quadro; a imagem **não** deve ser inserida nas paredes ou áreas do mapa.
-- Artista, título, ano, técnica, dimensões e status são atualizados no painel esquerdo conforme a posição selecionada.
-- Todos os dados podem ser alterados no painel administrativo sem editar o SVG nem republicar o site.
-
-Se no futuro houver mudança na disposição das posições, ajuste o próprio SVG e, se necessário, as coordenadas de `POSITIONS` em `public/app.js`.
-
-## Como publicar no Netlify
-
-1. Crie um repositório GitHub e envie **todo o conteúdo desta pasta** para a raiz do repositório: `public/`, `netlify/`, `netlify.toml` e `package.json`.
-2. No Netlify escolha **Add new project → Import an existing project**, conecte o repositório GitHub e use a configuração detectada. O diretório de publicação está em `public` e as funções em `netlify/functions`.
-3. Em **Project configuration → Environment variables**, cadastre **duas variáveis SECRETAS** no ambiente de produção:
-
-   - `ADMIN_PASSWORD` = senha forte escolhida pela equipe, com pelo menos 12 caracteres.
-   - `SESSION_SECRET` = sequência aleatória com pelo menos 32 caracteres. Pode gerar no Terminal com `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"`.
-
-4. Execute o deploy/redeploy. Acesse o endereço Netlify, clique no ícone de perfil e entre com a senha.
-5. Na aba **EXPOSIÇÃO**, cadastre o e-mail para o botão Contato. Na aba **OBRA**, selecione uma das 10 posições, preencha e salve. As atualizações aparecem no site público.
-
-**Não publique apenas a pasta `public` via drag-and-drop**, pois a parte administrativa depende das Netlify Functions, das dependências de `package.json` e do armazenamento Netlify Blobs. A senha **não pode** ser escrita no JavaScript público nem no repositório.
-
-O armazenamento é **site-wide**: os dados permanecem entre deploys do mesmo projeto Netlify. Projetos Netlify diferentes não compartilham automaticamente o catálogo. Não teste edições em uma prévia de deploy ligada ao mesmo site sem perceber que ela pode usar o armazenamento de produção.
-
-## Testar localmente
-
-Com Node.js instalado:
-
-```sh
-npm install
-npx netlify dev
-```
-
-Para experimentar o acesso restrito localmente, defina `ADMIN_PASSWORD` e `SESSION_SECRET` no ambiente do Netlify CLI. Abrir `index.html` diretamente ou servir apenas a pasta `public` mostra a apresentação visual, mas não ativa o banco de dados nem a administração.
-
-## Estrutura de arquivos
+Os próprios SVGs especificam **PPNeueMontreal-Book**, **PPNeueMontreal-Medium** e **PPNeueMontreal-Thin**. O arquivo `public/style.css` declara esses três estilos com as mesmas famílias e pesos. **As fontes NÃO estão incluídas no ZIP.** Para que o navegador reproduza fielmente a tipografia, adicione *arquivos webfont de sua própria licença* em `public/fonts/` com os nomes abaixo:
 
 ```
-public/
-  index.html            telas da exposição e editor
-  style.css             identidade visual e responsividade
-  app.js                navegação, sincronização do mapa e editor
-  assets/
-    planta.svg        mapa gráfico FINAL da exposição, com dez posições numeradas
-    corpo-1.png         ilustração recortada do WEBP do layout
-    corpo-2.png
-    corpo-3.png
-    logo-mits.png
-    logo-m.png
-    favicon.svg
-netlify/
-  functions/
-    api.mjs              autenticação, fichas e imagens
-netlify.toml             diretórios de deploy e cabeçalhos
-package.json            dependência @netlify/blobs
+public/fonts/
+  PPNeueMontreal-Book.woff2      (ou PPNeueMontreal-Book.otf)
+  PPNeueMontreal-Medium.woff2    (ou PPNeueMontreal-Medium.otf)
+  PPNeueMontreal-Thin.woff2      (ou PPNeueMontreal-Thin.otf)
 ```
 
-## Segurança e limites
+Use `.woff2` quando disponível e quando a licença permitir hospedagem na web. Se os arquivos tiverem nomes diferentes, ajuste os caminhos em `public/style.css`, na seção `@font-face`. Sem os arquivos, a página ainda abre, mas o navegador usará uma fonte substituta e alguns textos podem ter medidas diferentes. Não publique fontes em repositório público sem licença de uso e distribuição web.
 
-- Senha validada no servidor, sessão assinada em cookie HttpOnly, SameSite=Strict, validade de 8 horas.
-- Dados do editor não ficam disponíveis para gravação sem autenticação.
-- Imagens permitidas: JPEG, PNG ou WebP, até 5 MB. SVG pode ser usado para o **mapa**, não como foto carregada pelo painel.
-- Edições precisam ser feitas no projeto Netlify publicado. O ZIP entregue é um pacote de código, não significa que a publicação do site foi realizada.
-- Para uso com muitas pessoas e necessidades de auditoria/histórico, convém evoluir para contas individuais e banco de dados. A configuração atual é adequada para uma equipe pequena com senha compartilhada.
+## Atualização do GitHub que já está conectado ao Netlify
+
+1. Abra seu repositório `m-i-t-s/mits-exposicao-1-1` no GitHub.
+2. Atualize **somente os arquivos alterados** de `public/` usando a versão deste ZIP, preservando `netlify/`, `netlify.toml` e `package.json`. Se preferir, você pode substituir todo o conteúdo do repositório pelo conteúdo deste ZIP: a API foi mantida.
+3. Envie os três arquivos de fontes licenciadas para `public/fonts/` ou corrija os nomes se forem diferentes.
+4. Clique em **Commit changes**. O Netlify deve implantar o novo commit automaticamente.
+5. Atualize a página com Ctrl+F5 e teste capa, navegação pelo mapa, status e edição por senha.
+
+O código de autenticação e de armazenamento foi preservado. As variáveis `ADMIN_PASSWORD` e `SESSION_SECRET` que você já cadastrou no Netlify permanecem vinculadas ao projeto. Os dados de obras salvos no mesmo projeto Netlify não são apagados pelo upload do código.
+
+## O que pode ser alterado pelo painel
+
+- Obra 1–10: artista, título, ano, técnica, dimensões, status e fotografia JPG/PNG/WebP de até 5 MB.
+- Exposição: texto de curadoria, participantes e e-mail para contato.
+- Estados: Disponível, Reservada, Vendida ou Indisponível.
+
+A ilustração, a geometria do mapa, a marca e os componentes originais não são alterados pelo editor. Textos longos podem ser reduzidos **apenas dentro da área reservada à informação**, para evitar que avancem sobre a fotografia.
+
+## Estrutura de publicação
+
+O projeto usa `public/` como pasta de publicação e `netlify/functions/` como backend. As funções gravam os dados no Netlify Blobs, protegidas por senha armazenada nas variáveis de ambiente do Netlify. Não é necessário redigitar sua senha nem republicar o site para atualizar uma obra.
+
+### Testes locais
+
+Para abrir a interface local, use um servidor estático na pasta `public`. Para testar o acesso restrito e os dados reais, use o projeto Netlify publicado ou o Netlify CLI.
