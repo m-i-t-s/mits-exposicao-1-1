@@ -1,0 +1,17 @@
+{
+  "name": "mits-galeria-1-1",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Microsite de exposição 1:1 — MITS Galeria",
+  "scripts": {
+    "dev": "netlify dev",
+    "check": "node --check public/app.js && node --check netlify/functions/api.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^11.1.9"
+  },
+  "devDependencies": {
+    "netlify-cli": "^23.0.0"
+  }
+}
