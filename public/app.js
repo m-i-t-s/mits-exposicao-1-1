@@ -1,166 +1,189 @@
-/* 1:1 — MITS Galeria. Interface pública + editor conectado às Netlify Functions. */
+/* Exposição MITS 1:1: SVGs originais são a única fonte do layout visual. */
 (() => {
-  "use strict";
-  const $ = (sel) => document.querySelector(sel);
-  const $$ = (sel) => [...document.querySelectorAll(sel)];
-
-  const SEED = {
-    settings: {
-      curator: 'Curadoria de Lara Maia',
-      artists: 'Beatriz Lindenberg\nFyodor Pavlov-Andreevich\nAline Setton',
-      contactEmail: ''
-    },
-    artworks: Array.from({ length: 10 }, (_, i) => ({
-      id: i + 1, artist: 'Nome artista', title: 'Nome obra',
-      year: 'Ano obra', technique: 'Técnica obra', dimensions: 'Dimensões obra',
-      status: 'Disponível', imageUpdatedAt: null
-    }))
-  };
-  const POSITIONS = [
-    [22.6, 86.9], [12.8, 66.8], [34.0, 48.2], [12.8, 35.0],
-    [12.7, 12.8], [30.1, 7.3], [49.3, 13.3], [71.1, 7.3],
-    [86.6, 13.3], [85.4, 35.2]
-  ];
-  const statuses = new Set(['Disponível', 'Reservada', 'Vendida', 'Indisponível']);
-  const state = { data: structuredClone(SEED), activeId: 1, authenticated: false,
-    online: false, currentDialog: null };
-
-  function position(id) { return state.data.artworks.find(w => w.id === Number(id)); }
-  function openRoute() {
-    const match = location.hash.match(/^#obra-(10|[1-9])$/);
-    if (match) {
-      state.activeId = Number(match[1]);
-      $('#gallery').hidden = false;
-      $('#home').hidden = true;
-      renderWork();
-    } else {
-      $('#gallery').hidden = true;
-      $('#home').hidden = false;
-      document.title = '1:1 — MITS Galeria';
+'use strict';
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const NS = 'http://www.w3.org/2000/svg';
+const SEED = {
+  settings: {curator:'Curadoria de Lara Maia',artists:'Beatriz Lindenberg\nFyodor Pavlov-Andreevich\nAline Setton',contactEmail:''},
+  artworks: Array.from({length:10},(_,i)=>({id:i+1,artist:'Nome artista',title:'Nome obra',year:'Ano obra',technique:'Técnica obra',dimensions:'Dimensões obra',status:'Disponível',imageUpdatedAt:null}))
+};
+const state={data:structuredClone(SEED),activeId:1,authenticated:false,online:false,currentDialog:null};
+// Coordenadas extraídas dos números desenhados na ficha vetorial, em 1920×1080.
+const MAP_NUMBERS = [[1301,883],[1250,705],[1353,555],[1252,388],[1253,184],[1334,137],[1422,185],[1526,138],[1601,185],[1590,388]];
+const statuses=new Set(['Disponível','Reservada','Vendida','Indisponível']);
+function position(id){return state.data.artworks.find(w=>w.id===Number(id));}
+function setContent(selector,str){const x=$(selector);if(x)x.textContent=str??'';}
+function el(tag,props={}){const n=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(props))n.setAttribute(k,String(v));return n;}
+async function loadSvg(file,container){
+  const res=await fetch(`/assets/${file}`,{cache:'force-cache'});
+  if(!res.ok)throw Error(`Não foi possível carregar ${file}`);
+  const xml=new DOMParser().parseFromString(await res.text(),'image/svg+xml');
+  if(xml.querySelector('parsererror'))throw Error(`SVG inválido: ${file}`);
+  const original=document.importNode(xml.documentElement,true);
+  // Cada SVG usa classes Illustrator .cls-1, .cls-2 etc.
+  // Isolamos as classes para que as regras da capa não modifiquem a ficha.
+  const prefix=file.includes('capa')?'capa':'ficha';
+  original.querySelectorAll('[class]').forEach(node=>{
+    node.setAttribute('class',node.getAttribute('class').split(/\s+/).map(x=>`${prefix}-${x}`).join(' '));
+  });
+  original.querySelectorAll('style').forEach(style=>{
+    style.textContent=style.textContent
+      .replace(/\.cls-(\d+)/g,`.${prefix}-cls-$1`)
+      .replace(/font-family:\s*([^;]+);/g,(_,family)=>`font-family:${family},Arial,sans-serif;`);
+  });
+  original.removeAttribute('id');
+  original.setAttribute('role','img');
+  original.setAttribute('aria-label',file.includes('capa')?'Identidade visual da exposição 1:1':'Ficha e mapa gráfico da exposição');
+  original.setAttribute('preserveAspectRatio','xMidYMid meet');
+  container.replaceChildren(original);
+  return original;
+}
+function fitEditableSvgText(target){
+  if(!target.isConnected || $('#gallery').hidden)return;
+  const minimum=Number(target.dataset.fitMin||18);
+  const maxWidth=340; // mantém uma margem antes do retângulo da fotografia (x = 455.67)
+  try{
+    target.style.removeProperty('font-size');
+    const normalSize=parseFloat(getComputedStyle(target).fontSize)||40;
+    const actual=target.getComputedTextLength();
+    if(actual>maxWidth && actual>0){
+      target.style.fontSize=`${Math.max(minimum,normalSize*maxWidth/actual)}px`;
     }
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }
-  function go(id) {
-    const num = ((Number(id) - 1 + 10) % 10) + 1;
-    if (location.hash === `#obra-${num}`) {
-      state.activeId = num;
-      renderWork();
-    } else location.hash = `obra-${num}`;
-  }
-  function setContent(selector, str) { $(selector).textContent = str ?? ''; }
-
-  function renderWork() {
-    const work = position(state.activeId);
-    if (!work) return;
-    setContent('#work-number', String(work.id));
-    setContent('#work-artist', work.artist);
-    setContent('#work-title', work.title);
-    setContent('#work-year', work.year);
-    setContent('#work-technique', work.technique);
-    setContent('#work-dimensions', work.dimensions);
-    setContent('#work-status', statuses.has(work.status) ? work.status : 'Indisponível');
-    const image = $('#work-image');
-    if (work.imageUpdatedAt) {
-      const url = `/api/image/${work.id}?v=${encodeURIComponent(work.imageUpdatedAt)}`;
-      image.src = url;
-      image.alt = `${work.title}, de ${work.artist}`;
-      image.hidden = false;
-      $('#work-image-empty').hidden = true;
-      image.onerror = () => {image.hidden = true; $('#work-image-empty').hidden = false;};
-    } else {
-      image.hidden = true;
-      image.removeAttribute('src');
-      $('#work-image-empty').hidden = false;
-    }
-    syncMapArtworks();
-    $$('.position').forEach(btn => {
-      const active = Number(btn.dataset.id) === work.id;
-      btn.classList.toggle('active', active);
-      btn.setAttribute('aria-pressed', String(active));
-      btn.title = `Posição ${btn.dataset.id}${active ? ' — selecionada' : ''}`;
-    });
-    document.title = `${work.id}. ${work.artist} — 1:1 | MITS`;
-    $('#edit-position').value = String(work.id);
-  }
-  /**
-   * O mapa é a representação gráfica FINAL da exposição, não uma planta técnica.
-   * Os números são pontos de navegação; a fotografia selecionada aparece no
-   * retângulo preto central da ficha, e nunca dentro do mapa.
-   */
-  function syncHotspotsFromSvg(svg) {
-    const view = svg.viewBox?.baseVal;
-    if (!view || !view.width || !view.height) return;
-    const textNodes = [...svg.querySelectorAll('text')];
-    for (let id = 1; id <= 10; id++) {
-      const target = svg.getElementById?.(`numero-${id}`) ||
-        svg.querySelector(`[data-hotspot="${id}"]`) ||
-        textNodes.find(el => el.textContent.trim() === String(id));
-      if (!target) continue;
-      try {
-        const box = target.getBBox();
-        const ctm = target.getCTM();
-        if (!ctm) continue;
-        const point = svg.createSVGPoint();
-        point.x = box.x + box.width/2;
-        point.y = box.y + box.height/2;
-        const rootCtm = svg.getCTM();
-        if (!rootCtm) continue;
-        const p = point.matrixTransform(rootCtm.inverse().multiply(ctm));
-        const hotspot = $(`.position[data-id="${id}"]`);
-        if (hotspot) {
-          hotspot.style.left = `${(p.x - view.x) / view.width * 100}%`;
-          hotspot.style.top = `${(p.y - view.y) / view.height * 100}%`;
-        }
-      } catch { /* Imagens SVG sem posições de texto mantêm os hotspots do mockup. */ }
-    }
-  }
-  function syncMapArtworks() {
-    const object = $('#plan-vector');
-    const svg = object?.contentDocument?.querySelector('svg');
-    if (svg) syncHotspotsFromSvg(svg);
-  }
-  function renderSettings() {
-    const cfg = state.data.settings;
-    setContent('#home-curator', cfg.curator || SEED.settings.curator);
-    const artistsEl = $('#home-artists');
-    artistsEl.replaceChildren();
-    (cfg.artists || SEED.settings.artists).split('\n').forEach((name, index) => {
-      if (index) artistsEl.append(document.createElement('br'));
-      artistsEl.append(document.createTextNode(name));
+  }catch(error){console.warn('Falha ao ajustar o texto da obra:',error);}
+}
+function renderSvgText(svg,placeholder,value,min=18){
+  const normalize=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().replace(/\s+/g,' ').toLowerCase();
+  const target=[...svg.querySelectorAll('text')].find(e=>normalize(e.textContent)===normalize(placeholder));
+  if(!target)return;
+  target.replaceChildren(document.createTextNode(String(value||'')));
+  target.removeAttribute('textLength');
+  target.removeAttribute('lengthAdjust');
+  target.dataset.fitMin=String(min);
+  // Medição apenas quando o SVG está visível e a fonte foi carregada.
+  requestAnimationFrame(()=>fitEditableSvgText(target));
+  document.fonts.ready.then(()=>requestAnimationFrame(()=>fitEditableSvgText(target)));
+}
+function addImage(svg,work){
+  const frame=[...svg.querySelectorAll('rect')].find(r=>r.getAttribute('x')==='455.67' && r.getAttribute('y')==='82.33');
+  if(!frame || !work.imageUpdatedAt)return;
+  const image=el('image',{x:455.67,y:82.33,width:504.33,height:630.42,preserveAspectRatio:'xMidYMid meet','data-original-colors':'true'});
+  image.setAttribute('href',`/api/image/${work.id}?v=${encodeURIComponent(work.imageUpdatedAt)}`);
+  frame.after(image);
+}
+function updateGallerySvg(svg,work){
+  renderSvgText(svg,'Nome artista',work.artist,20);
+  renderSvgText(svg,'Nome obra',work.title,19);
+  renderSvgText(svg,'Ano obra',work.year,17);
+  renderSvgText(svg,'Técnica obra',work.technique,16);
+  renderSvgText(svg,'Dimensões obra',work.dimensions,16);
+  // Os dois arquivos originais conservam, inclusive, os dois estados ilustrados pela designer.
+  // Para Reservada/Vendida, cobrimos SOMENTE o selo editável.
+  if(!['Disponível','Indisponível'].includes(work.status)){
+    const cover=el('rect',{x:85,y:663,width:255,height:56,fill:'#ebebeb'});
+    const outline=el('rect',{x:92,y:669,width:190,height:45,fill:'none',stroke:'#ff0','stroke-width':5});
+    const txt=el('text',{x:103,y:705,style:"font-family:PPNeueMontreal-Thin,'PP Neue Montreal',Arial,sans-serif;font-size:30px;font-weight:200;fill:#000"});
+    txt.textContent=work.status;
+    const g=el('g',{'data-dynamic-status':'true'});g.append(cover,outline,txt);svg.append(g);
+    requestAnimationFrame(()=>{
+      try{const w=txt.getComputedTextLength()+18;outline.setAttribute('width',Math.max(175,w+14));}catch{}
     });
   }
-  function createHotspots() {
-    const host = $('#plan-hotspots');
-    POSITIONS.forEach(([x, y], index) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'position';
-      btn.dataset.id = String(index + 1);
-      btn.style.left = `${x}%`;
-      btn.style.top = `${y}%`;
-      btn.setAttribute('aria-label', `Ver obra na posição ${index + 1}`);
-      btn.addEventListener('click', () => go(index + 1));
-      host.append(btn);
-      const opt = document.createElement('option');
-      opt.value = String(index + 1);
-      opt.textContent = `Obra ${index + 1}`;
-      $('#edit-position').append(opt);
-    });
+  // O número grande 1 é mantido como a designer desenhou. Para 2–10,
+  // ampliamos os próprios VETORES dos números do mapa (mesma tipografia de origem).
+  if(work.id!==1){
+    const g=el('g');
+    g.append(el('rect',{x:75,y:68,width:190,height:154,fill:'#ebebeb'}));
+    const numberedGroup=[...svg.children].find(e=>e.localName==='g'&&e.children.length===75);
+    const source=numberedGroup?.children[37+work.id];
+    if(source){
+      const bbox=source.getBBox();
+      const scale=110/bbox.height;
+      const copied=source.cloneNode(true);
+      copied.removeAttribute('id');
+      const wrapper=el('g',{transform:`translate(${95-bbox.x*scale} ${82.33-bbox.y*scale}) scale(${scale})`});
+      wrapper.append(copied);g.append(wrapper);
+    }
+    svg.append(g);
   }
-  function showToast(message) {
-    const t = $('#toast');
-    t.textContent = message;
-    t.classList.add('visible');
-    clearTimeout(showToast.timer);
-    showToast.timer = setTimeout(() => t.classList.remove('visible'), 3400);
+  // O destaque amarelo é reposicionado SEM alterar o mapa original.
+  const highlight=[...svg.querySelectorAll('rect')].find(r=>r.getAttribute('x')==='1267.33' && r.getAttribute('y')==='849');
+  if(highlight){
+    const [x,y]=MAP_NUMBERS[work.id-1];
+    const width=work.id===10?92:68;
+    highlight.setAttribute('x',String(x-width/2));
+    highlight.setAttribute('y',String(y-34));
+    highlight.setAttribute('width',String(width));
+    highlight.setAttribute('height','68');
   }
-  function applyTheme(theme) {
-    const isDark = theme === 'dark';
-    document.documentElement.classList.toggle('dark', isDark);
-    $$('.theme-switch').forEach(b => b.setAttribute('aria-label', isDark ? 'Ativar modo claro' : 'Ativar modo noturno'));
-    try { localStorage.setItem('mits-theme', theme); } catch {}
-    syncMapArtworks();
+  addImage(svg,work);
+}
+async function renderWork(){
+  if($('#gallery').hidden)return;
+  const work=position(state.activeId);
+  if(!work)return;
+  const file=work.status==='Indisponível'?'expografia-ficha-indisponivel-original.svg':'expografia-ficha-disponivel-original.svg';
+  const container=$('#gallery-svg-container');
+  const ticket=`${work.id}:${work.imageUpdatedAt}:${work.artist}:${work.title}:${work.status}:${work.year}:${work.technique}:${work.dimensions}`;
+  if(container.dataset.ticket!==ticket){
+    container.dataset.ticket=ticket;
+    try{const svg=await loadSvg(file,container);if(container.dataset.ticket!==ticket)return;updateGallerySvg(svg,work);}
+    catch(e){console.error(e);showToast('Erro ao carregar o SVG da ficha.');}
   }
+  document.title=`${work.id}. ${work.artist} — 1:1 | MITS`;
+  $('#edit-position').value=String(work.id);
+  $$('.map-hit').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.id)===work.id)));
+}
+async function renderSettings(){
+  const cfg=state.data.settings;
+  const container=$('#home-svg-container');
+  if(!container.querySelector('svg'))return;
+  const svg=container.querySelector('svg');
+  const curator=svg.querySelector('text');
+  if(curator)curator.textContent=cfg.curator||SEED.settings.curator;
+  const prior=svg.querySelector('[data-dynamic-artists]');if(prior)prior.remove();
+  if((cfg.artists||'').trim()!==SEED.settings.artists.trim()){
+    const group=el('g',{'data-dynamic-artists':'true'});
+    group.append(el('rect',{x:67,y:403,width:535,height:168,fill:'#ebebeb'}));
+    const t=el('text',{x:71,y:453,style:"font-family:PPNeueMontreal-Book,'PP Neue Montreal',Arial,sans-serif;fill:#000;font-size:32.5px"});
+    (cfg.artists||'').split('\n').slice(0,5).forEach((s,i)=>{const span=el('tspan',{x:71,dy:i?'41':'0'});span.textContent=s;t.append(span)});
+    group.append(t);svg.append(group);
+  }
+}
+function createHotspots(){
+  const host=$('#plan-hotspots');
+  MAP_NUMBERS.forEach(([x,y],index)=>{
+    const btn=document.createElement('button');
+    btn.type='button';btn.className='map-hit';btn.dataset.id=String(index+1);
+    const w=index===9?95:70;
+    btn.style.left=`${x/1920*100}%`;
+    btn.style.top=`${y/1080*100}%`;
+    btn.style.width=`${w/1920*100}%`;
+    btn.style.height=`${70/1080*100}%`;
+    btn.setAttribute('aria-label',`Ver obra na posição ${index+1}`);
+    btn.addEventListener('click',()=>go(index+1));host.append(btn);
+    const opt=document.createElement('option');opt.value=String(index+1);opt.textContent=`Obra ${index+1}`;$('#edit-position').append(opt);
+  });
+}
+function go(id){
+  const num=((Number(id)-1+10)%10)+1;
+  if(location.hash===`#obra-${num}`){state.activeId=num;renderWork();}
+  else location.hash=`obra-${num}`;
+}
+function openRoute(){
+  const match=location.hash.match(/^#obra-(10|[1-9])$/);
+  if(match){state.activeId=Number(match[1]);$('#home').hidden=true;$('#gallery').hidden=false;renderWork();}
+  else{$('#home').hidden=false;$('#gallery').hidden=true;document.title='1:1 — MITS Galeria';}
+  window.scrollTo({left:0,top:0,behavior:'instant'});
+}
+function showToast(message){
+  const t=$('#toast');t.textContent=message;t.classList.add('visible');
+  clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>t.classList.remove('visible'),3400);
+}
+function applyTheme(theme){
+  document.documentElement.classList.toggle('dark',theme==='dark');
+  try{localStorage.setItem('mits-theme',theme);}catch{}
+}
   async function request(path, opts = {}) {
     let response;
     try {
@@ -339,43 +362,40 @@
     }
     openDialog('contact');
   }
-  function init() {
-    createHotspots();
-    $('#plan-vector').addEventListener('load', syncMapArtworks);
-    try {applyTheme(localStorage.getItem('mits-theme') || 'light');} catch {applyTheme('light');}
-    $$('.theme-switch').forEach(btn => btn.addEventListener('click', () => applyTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark')));
-    $$('.admin-trigger').forEach(btn => btn.addEventListener('click', adminAccess));
-    $$('[data-close-dialog]').forEach(btn => btn.addEventListener('click', closeDialog));
-    $('#modal-backdrop').addEventListener('click', evt => {if (evt.target === $('#modal-backdrop')) closeDialog();});
-    $('#enter-gallery').addEventListener('click', () => go(1));
-    $('#back-home').addEventListener('click', () => location.hash = 'inicio');
-    $('#gallery-back').addEventListener('click', () => location.hash = 'inicio');
-    $('#previous-work').addEventListener('click', () => go(state.activeId - 1));
-    $('#next-work').addEventListener('click', () => go(state.activeId + 1));
-    $('#contact-button').addEventListener('click', contact);
-    $('#login-form').addEventListener('submit',login);
-    $('#edit-work-form').addEventListener('submit',saveWork);
-    $('#edit-settings-form').addEventListener('submit',saveSettings);
-    $('#edit-position').addEventListener('change',fillWorkForm);
-    $('#tab-work').addEventListener('click',() => setAdminTab('work'));
-    $('#tab-settings').addEventListener('click',() => setAdminTab('settings'));
-    $('#logout').addEventListener('click', async () => {
-      try {await request('logout',{method:'POST'});} catch {}
-      state.authenticated = false;
-      closeDialog();
-      showToast('Acesso encerrado.');
-    });
-    document.addEventListener('keydown', evt => {
-      if (evt.key === 'Escape' && state.currentDialog) closeDialog();
-      if (!state.currentDialog && !$('#gallery').hidden) {
-        if (evt.key === 'ArrowLeft') go(state.activeId-1);
-        if (evt.key === 'ArrowRight') go(state.activeId+1);
-      }
-    });
-    window.addEventListener('hashchange', openRoute);
-    renderSettings();
-    openRoute();
-    loadData();
-  }
-  document.addEventListener('DOMContentLoaded',init);
+
+function init(){
+  createHotspots();
+  loadSvg('expografia-capa-original.svg',$('#home-svg-container')).then(renderSettings).catch(e=>console.error(e));
+  try{applyTheme(localStorage.getItem('mits-theme')||'light');}catch{applyTheme('light');}
+  $('.theme-switch').addEventListener('click',()=>applyTheme(document.documentElement.classList.contains('dark')?'light':'dark'));
+  $('.admin-trigger').addEventListener('click',adminAccess);
+  $$('[data-close-dialog]').forEach(btn=>btn.addEventListener('click',closeDialog));
+  $('#modal-backdrop').addEventListener('click',evt=>{if(evt.target===$('#modal-backdrop'))closeDialog();});
+  $('#enter-gallery').addEventListener('click',()=>go(1));
+  $('#back-home').addEventListener('click',()=>location.hash='inicio');
+  $('#previous-work').addEventListener('click',()=>go(state.activeId-1));
+  $('#next-work').addEventListener('click',()=>go(state.activeId+1));
+  $('#contact-button').addEventListener('click',contact);
+  $('#login-form').addEventListener('submit',login);
+  $('#edit-work-form').addEventListener('submit',saveWork);
+  $('#edit-settings-form').addEventListener('submit',saveSettings);
+  $('#edit-position').addEventListener('change',fillWorkForm);
+  $('#tab-work').addEventListener('click',()=>setAdminTab('work'));
+  $('#tab-settings').addEventListener('click',()=>setAdminTab('settings'));
+  $('#logout').addEventListener('click',async()=>{
+    try{await request('logout',{method:'POST'});}catch{}
+    state.authenticated=false;closeDialog();showToast('Acesso encerrado.');
+  });
+  document.addEventListener('keydown',evt=>{
+    if(evt.key==='Escape'&&state.currentDialog)closeDialog();
+    if(!state.currentDialog&&!$('#gallery').hidden){
+      if(evt.key==='ArrowLeft')go(state.activeId-1);
+      if(evt.key==='ArrowRight')go(state.activeId+1);
+    }
+  });
+  window.addEventListener('hashchange',openRoute);
+  openRoute();
+  loadData();
+}
+document.addEventListener('DOMContentLoaded',init);
 })();
