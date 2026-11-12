@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="499" height="1005" viewBox="0 0 499 1005" role="img" aria-label="Mapa gráfico da exposição com dez posições de obras">
+ <title>Mapa da exposição — MITS Galeria — 1:1</title>
+ <desc>Mapa gráfico final da exposição em SVG. Os números de 1 a 10 são posições interativas. A fotografia da obra aparece no quadro central da ficha.</desc>
+ <g fill="none" stroke="#050505" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="butt">
+  <path d="M24 220.5V46H58.8V18.5H257.4V46H291.3V18.5H438.5V46H474V220.5H439.4V255.5H474V437.5H439.4V472H474V606H311.7 M311.7 615H474.9V776.4H406.5V694.7H311.9 M24 255.5H58.8V220.5 M24 436.8H58.9V472H24V993.5H88.2 M98 993.5H155 M166.9 993.5H230V775.5 M242 775.5V922.1H271 M336 922.1H385 M394 922.1H475V788.3H311.9 M312 706H395.6V776.5H312"/>
+  <rect x="125.7" y="220.9" width="34" height="35"/>
+  <rect x="337" y="220.9" width="34" height="35"/>
+  <path d="M311.5 695.8H407 M311.5 788.5H474 M230 775.5V993.4"/>
+  <path d="M357.5 727l15.5 14.1-15.5 14.1m15.5-14.1h-26.5" stroke-width="1.1"/>
+  <path d="M289 994.5V944m0 0-13.5 13.5M289 944l13.5 13.5" stroke-width="1.1"/>
+ </g>
+ <g font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" fill="#050505" font-size="53" font-weight="100" text-anchor="middle" dominant-baseline="middle">
+  <text x="114" y="874">1</text>
+  <text x="64" y="677">2</text>
+  <text x="170" y="513">3</text>
+  <text x="64" y="352">4</text>
+  <text x="64" y="133">5</text>
+  <text x="151" y="78">6</text>
+  <text x="246" y="133">7</text>
+  <text x="355" y="78">8</text>
+  <text x="432" y="133">9</text>
+  <text x="421" y="358">10</text>
+ </g>
+</svg>
