@@ -1,1 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#ffff00"/><text x="6" y="51" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="54">1</text></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Camada_1" data-name="Camada 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #ff0;
+      }
+    </style>
+  </defs>
+  <rect class="cls-1" y="0" width="64" height="64"/>
+  <g>
+    <path d="M17.74,26.86c-1.17.91-3.68,1.26-6.33,1.26v-5.77c4.21,0,7.63-1.65,7.63-5.33h6.07v29.96h-7.37v-20.11Z"/>
+    <path d="M29.79,33.54v-6.59h6.59v6.59h-6.59ZM29.79,46.98v-6.59h6.59v6.59h-6.59Z"/>
+    <path d="M45.22,26.86c-1.17.91-3.68,1.26-6.33,1.26v-5.77c4.21,0,7.63-1.65,7.63-5.33h6.07v29.96h-7.37v-20.11Z"/>
+  </g>
+</svg>
