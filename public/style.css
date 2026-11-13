@@ -6,7 +6,7 @@
 @font-face {font-family:'PPNeueMontreal-Medium';src:url('/fonts/PPNeueMontreal-Medium.woff2') format('woff2'),url('/fonts/PPNeueMontreal-Medium.otf') format('opentype');font-style:normal;font-display:swap;}
 @font-face {font-family:'PPNeueMontreal-Thin';src:url('/fonts/PPNeueMontreal-Thin.woff2') format('woff2'),url('/fonts/PPNeueMontreal-Thin.otf') format('opentype');font-style:normal;font-display:swap;}
 :root {--page:#ebebeb;--ink:#000;--yellow:#ff0;--muted:#5e5e5e;--input:white;font-family:'PP Neue Montreal',Arial,sans-serif;background:var(--page);color:var(--ink);font-synthesis:none}
-:root.dark {--page:#171717;--ink:#f0f0f0;--muted:#aaa;--input:#252525;}
+:root.dark {--page:#000;--ink:#ebebeb;--muted:#aaa;--input:#252525;}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;}
 body{background:var(--page);color:var(--ink);}
@@ -21,7 +21,7 @@ a{color:inherit}
 /* Botões são transparentes; suas coordenadas correspondem exatamente ao viewBox 1920×1080. */
 .svg-hit,.map-hit {display:block;position:absolute;border:0;padding:0;background:transparent;color:transparent;}
 .svg-hit:focus-visible,.map-hit:focus-visible {outline:3px solid #ff0;outline-offset:2px;}
-.svg-hit:hover,.map-hit:hover{background:rgba(255,255,0,.10)}
+/* Sem manchas de hover: os SVGs são preservados integralmente. */
 .home-next{left:60.1%;top:37%;width:6.4%;height:18.2%;}
 .home-theme{left:3.2%;top:87.3%;width:3.7%;height:7%;}
 .home-admin{left:93.5%;top:87.5%;width:4%;height:8%;}
@@ -29,17 +29,29 @@ a{color:inherit}
 .next-work{left:45.8%;top:84.9%;width:4.2%;height:7.5%;}
 .contact-work{left:9.7%;top:84.9%;width:35.55%;height:7.5%;}
 .gallery-home{left:90.4%;top:5.3%;width:6.5%;height:11%;}
+.gallery-theme{left:94%;top:88%;width:4%;height:8%;}
 .svg-hotspots{position:absolute;inset:0;pointer-events:none;}
 .map-hit{pointer-events:auto;min-width:28px;min-height:28px;transform:translate(-50%,-50%);}
-.dark .original-svg svg {filter:invert(1) hue-rotate(180deg);}
-/* As imagens não são invertidas no modo escuro, apenas o layout. */
-.dark .original-svg svg image[data-original-colors] {filter:invert(1) hue-rotate(180deg);}
-/* Em telas estreitas, preservamos os mesmos 1920×1080 sem empilhar ou desalinhar elementos. */
-@media(max-width:740px){
-  body{overflow-x:auto;}
-  .screen{justify-content:flex-start;min-height:100svh;}
-  .artboard{width:960px;}
-  .modal-backdrop{position:fixed;left:0;width:100vw;}
+/* Modo escuro usa os próprios SVGs originais enviados, nunca filtros de inversão. */
+/* Hotspots divididos por arte: desktop (1920x1080) e mobile (390x844). */
+.map-hit.mobile{display:none;}
+/* O próprio SVG mobile determina a posição de cada elemento. */
+@media(max-width:740px) and (orientation:portrait){
+  html,body{width:100%;overflow-x:hidden;}
+  .screen{align-items:flex-start;justify-content:center;min-height:100svh;}
+  .artboard{width:100vw;aspect-ratio:390/844;height:auto;flex:none;}
+  .map-hit.desktop{display:none;}
+  .map-hit.mobile{display:block;}
+  .home-next{left:18.2%;top:50.5%;width:14%;height:10%;}
+  .home-theme{left:3.3%;top:2.9%;width:10.5%;height:6.9%;}
+  .home-admin{left:85%;top:2.8%;width:12%;height:7%;}
+  .prev-work{left:6.8%;top:91.7%;width:9.3%;height:4.9%;}
+  .next-work{left:84.1%;top:91.7%;width:9.3%;height:4.9%;}
+  .contact-work{left:15.5%;top:91.7%;width:69.1%;height:4.9%;}
+  .gallery-home{left:5.8%;top:2.5%;width:11.3%;height:6.2%;}
+  .gallery-theme{left:6.3%;top:10.1%;width:10%;height:5.5%;}
+  .map-hit{min-width:25px;min-height:25px;}
+  .modal-backdrop{width:100vw;}
 }
 /* Modais */
 .modal-backdrop { position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:99;display:grid;place-items:center;padding:24px; }

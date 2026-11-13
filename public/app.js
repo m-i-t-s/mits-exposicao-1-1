@@ -8,9 +8,14 @@ const SEED = {
   settings: {curator:'Curadoria de Lara Maia',artists:'Beatriz Lindenberg\nFyodor Pavlov-Andreevich\nAline Setton',contactEmail:''},
   artworks: Array.from({length:10},(_,i)=>({id:i+1,artist:'Nome artista',title:'Nome obra',year:'Ano obra',technique:'Técnica obra',dimensions:'Dimensões obra',status:'Disponível',imageUpdatedAt:null}))
 };
-const state={data:structuredClone(SEED),activeId:1,authenticated:false,online:false,currentDialog:null};
+const state={data:structuredClone(SEED),activeId:1,authenticated:false,online:false,currentDialog:null,theme:'light'};
 // Coordenadas extraídas dos números desenhados na ficha vetorial, em 1920×1080.
-const MAP_NUMBERS = [[1301,883],[1250,705],[1353,555],[1252,388],[1253,184],[1334,137],[1422,185],[1526,138],[1601,185],[1590,388]];
+const MAP_NUMBERS = [[1271.33,883],[1223,700],[1324,549],[1223,395],[1223,188],[1304,134],[1393,188],[1499,134],[1569,188],[1560,390]];
+// Centros das posições numeradas, lidos do SVG de 390 x 844 da designer.
+const MOBILE_MAP_NUMBERS = [[214.05,375.4],[194.7,296.4],[238.6,230.8],[194.8,163.8],[194.8,74.0],[229.9,50.6],[268.7,73.8],[314.1,50.6],[344.8,73.8],[341.3,161.6]];
+const mobileQuery=window.matchMedia('(max-width:740px) and (orientation:portrait)');
+const isMobile=()=>mobileQuery.matches;
+const sourceSuffix=()=>isMobile()?'-mobile':'';
 const statuses=new Set(['Disponível','Reservada','Vendida','Indisponível']);
 function position(id){return state.data.artworks.find(w=>w.id===Number(id));}
 function setContent(selector,str){const x=$(selector);if(x)x.textContent=str??'';}
@@ -42,7 +47,7 @@ async function loadSvg(file,container){
 function fitEditableSvgText(target){
   if(!target.isConnected || $('#gallery').hidden)return;
   const minimum=Number(target.dataset.fitMin||18);
-  const maxWidth=340; // mantém uma margem antes do retângulo da fotografia (x = 455.67)
+  const maxWidth=Number(target.dataset.fitMax||340); // respeita a coluna de texto do SVG escolhido
   try{
     target.style.removeProperty('font-size');
     const normalSize=parseFloat(getComputedStyle(target).fontSize)||40;
@@ -52,7 +57,7 @@ function fitEditableSvgText(target){
     }
   }catch(error){console.warn('Falha ao ajustar o texto da obra:',error);}
 }
-function renderSvgText(svg,placeholder,value,min=18){
+function renderSvgText(svg,placeholder,value,min=18,max=340){
   const normalize=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().replace(/\s+/g,' ').toLowerCase();
   const target=[...svg.querySelectorAll('text')].find(e=>normalize(e.textContent)===normalize(placeholder));
   if(!target)return;
@@ -60,18 +65,74 @@ function renderSvgText(svg,placeholder,value,min=18){
   target.removeAttribute('textLength');
   target.removeAttribute('lengthAdjust');
   target.dataset.fitMin=String(min);
+  target.dataset.fitMax=String(max);
   // Medição apenas quando o SVG está visível e a fonte foi carregada.
   requestAnimationFrame(()=>fitEditableSvgText(target));
   document.fonts.ready.then(()=>requestAnimationFrame(()=>fitEditableSvgText(target)));
 }
 function addImage(svg,work){
-  const frame=[...svg.querySelectorAll('rect')].find(r=>r.getAttribute('x')==='455.67' && r.getAttribute('y')==='82.33');
+  const mobile=isMobile();
+  const f=mobile?{x:167.64,y:473.69,w:193.9,h:242.37}:{x:455.67,y:82.33,w:504.33,h:630.42};
+  const frame=[...svg.querySelectorAll('rect')].find(r=>Math.abs(Number(r.getAttribute('x'))-f.x)<.03 && Math.abs(Number(r.getAttribute('y'))-f.y)<.03);
   if(!frame || !work.imageUpdatedAt)return;
-  const image=el('image',{x:455.67,y:82.33,width:504.33,height:630.42,preserveAspectRatio:'xMidYMid meet','data-original-colors':'true'});
+  const image=el('image',{x:f.x,y:f.y,width:f.w,height:f.h,preserveAspectRatio:'xMidYMid meet'});
   image.setAttribute('href',`/api/image/${work.id}?v=${encodeURIComponent(work.imageUpdatedAt)}`);
   frame.after(image);
 }
+/* Atualizações contidas dentro das áreas móveis que já existem no desenho original. */
+function addMobileNumber(svg,work){
+  if(work.id===1)return;
+  const target=el('g',{'data-dynamic-number':'true'});
+  target.append(el('rect',{x:25,y:470,width:111,height:50,fill:state.theme==='dark'?'#000':'#ebebeb'}));
+  // Os algarismos foram convertidos em paths pelo Illustrator. Reutilizamos
+  // exatamente os vetores da própria planta, ampliados para o campo do número.
+  const [cx,cy]=MOBILE_MAP_NUMBERS[work.id-1];
+  const candidates=[...svg.querySelectorAll('path')].filter(p=>{
+    const b=p.getBBox();
+    const cX=b.x+b.width/2,cY=b.y+b.height/2;
+    return b.height>13&&b.height<20&&b.width>2&&b.width<20&&Math.abs(cY-cy)<14&&Math.abs(cX-cx)<19;
+  });
+  if(!candidates.length)return;
+  const minX=Math.min(...candidates.map(e=>e.getBBox().x)), maxX=Math.max(...candidates.map(e=>{const b=e.getBBox();return b.x+b.width;}));
+  const minY=Math.min(...candidates.map(e=>e.getBBox().y)), maxY=Math.max(...candidates.map(e=>{const b=e.getBBox();return b.y+b.height;}));
+  const scale=42/(maxY-minY);
+  const wrapper=el('g',{transform:`translate(${28.87-minX*scale} ${473.69-minY*scale}) scale(${scale})`});
+  for(const source of candidates){const copy=source.cloneNode(true);copy.removeAttribute('id');copy.style.fill=state.theme==='dark'?'#ebebeb':'#000';copy.style.stroke='none';wrapper.append(copy);}
+  target.append(wrapper);svg.append(target);
+}
+function updateMobileGallery(svg,work){
+  renderSvgText(svg,'Nome artista',work.artist,8.5,126);
+  renderSvgText(svg,'Nome obra',work.title,8.5,126);
+  renderSvgText(svg,'Ano obra',work.year,8,126);
+  renderSvgText(svg,'Tecnica obra',work.technique,7.5,127);
+  renderSvgText(svg,'Dimensoes obra',work.dimensions,7.5,127);
+  if(!['Disponível','Indisponível'].includes(work.status)){
+    const bg=state.theme==='dark'?'#000':'#ebebeb';
+    const txtfill=state.theme==='dark'?'#ebebeb':'#000';
+    const g=el('g',{'data-dynamic-status':'true'});
+    g.append(el('rect',{x:27,y:698,width:132,height:23,fill:bg}));
+    const t=el('text',{x:30,y:714,style:`font-family:PPNeueMontreal-Thin,'PP Neue Montreal',Arial,sans-serif;font-size:13px;fill:${txtfill}`});
+    t.textContent=work.status;
+    g.append(t);
+    const outline=el('rect',{x:28.5,y:700,width:59,height:16,fill:'none',stroke:'#ff0','stroke-width':1.8});
+    g.append(outline);svg.append(g);
+    requestAnimationFrame(()=>{try{outline.setAttribute('width',t.getComputedTextLength()+7);}catch{}});
+  }
+  addMobileNumber(svg,work);
+  const [cx,cy]=MOBILE_MAP_NUMBERS[work.id-1];
+  if(work.id!==1){
+    let hi=[...svg.querySelectorAll('rect')].find(r=>Math.abs(Number(r.getAttribute('x'))-200.92)<.03&&Math.abs(Number(r.getAttribute('y'))-361.02)<.03);
+    if(!hi)hi=[...svg.querySelectorAll('path')].find(p=>{const b=p.getBBox();return b.x>198&&b.x<201&&b.y>359&&b.y<361&&b.width>30&&b.width<34&&b.height>30&&b.height<34;});
+    if(hi){
+      const x0=215.68,y0=375.78;
+      const wide=work.id===10?1.5:1;
+      hi.setAttribute('transform',`translate(${cx-x0} ${cy-y0}) translate(${x0} ${y0}) scale(${wide} 1) translate(${-x0} ${-y0})`);
+    }
+  }
+  addImage(svg,work);
+}
 function updateGallerySvg(svg,work){
+  if(isMobile()){updateMobileGallery(svg,work);return;}
   renderSvgText(svg,'Nome artista',work.artist,20);
   renderSvgText(svg,'Nome obra',work.title,19);
   renderSvgText(svg,'Ano obra',work.year,17);
@@ -80,9 +141,9 @@ function updateGallerySvg(svg,work){
   // Os dois arquivos originais conservam, inclusive, os dois estados ilustrados pela designer.
   // Para Reservada/Vendida, cobrimos SOMENTE o selo editável.
   if(!['Disponível','Indisponível'].includes(work.status)){
-    const cover=el('rect',{x:85,y:663,width:255,height:56,fill:'#ebebeb'});
+    const cover=el('rect',{x:85,y:663,width:255,height:56,fill:state.theme==='dark'?'#000':'#ebebeb'});
     const outline=el('rect',{x:92,y:669,width:190,height:45,fill:'none',stroke:'#ff0','stroke-width':5});
-    const txt=el('text',{x:103,y:705,style:"font-family:PPNeueMontreal-Thin,'PP Neue Montreal',Arial,sans-serif;font-size:30px;font-weight:200;fill:#000"});
+    const txt=el('text',{x:103,y:705,style:`font-family:PPNeueMontreal-Thin,'PP Neue Montreal',Arial,sans-serif;font-size:30px;font-weight:200;fill:${state.theme==='dark'?'#ebebeb':'#000'}`});
     txt.textContent=work.status;
     const g=el('g',{'data-dynamic-status':'true'});g.append(cover,outline,txt);svg.append(g);
     requestAnimationFrame(()=>{
@@ -93,7 +154,7 @@ function updateGallerySvg(svg,work){
   // ampliamos os próprios VETORES dos números do mapa (mesma tipografia de origem).
   if(work.id!==1){
     const g=el('g');
-    g.append(el('rect',{x:75,y:68,width:190,height:154,fill:'#ebebeb'}));
+    g.append(el('rect',{x:75,y:68,width:190,height:154,fill:state.theme==='dark'?'#000':'#ebebeb'}));
     const numberedGroup=[...svg.children].find(e=>e.localName==='g'&&e.children.length===75);
     const source=numberedGroup?.children[37+work.id];
     if(source){
@@ -106,15 +167,19 @@ function updateGallerySvg(svg,work){
     }
     svg.append(g);
   }
-  // O destaque amarelo é reposicionado SEM alterar o mapa original.
-  const highlight=[...svg.querySelectorAll('rect')].find(r=>r.getAttribute('x')==='1267.33' && r.getAttribute('y')==='849');
-  if(highlight){
+  // Move o destaque vetorial original do número 1 para a posição selecionada.
+  // No Illustrator, ele é retângulo (claro disponível) ou caminho composto
+  // (claro indisponível e ambos escuros). Preservamos seu traço e suas cores.
+  let highlight=[...svg.querySelectorAll('rect')].find(r=>r.getAttribute('x')==='1237.33' && r.getAttribute('y')==='849');
+  if(!highlight) highlight=[...svg.querySelectorAll('path')].find(p=>{
+    try{const b=p.getBBox();return b.x>1233&&b.x<1236&&b.y>845&&b.y<849&&b.width>70&&b.width<75&&b.height>70&&b.height<75;}
+    catch{return false;}
+  });
+  if(highlight && work.id!==1){
     const [x,y]=MAP_NUMBERS[work.id-1];
-    const width=work.id===10?92:68;
-    highlight.setAttribute('x',String(x-width/2));
-    highlight.setAttribute('y',String(y-34));
-    highlight.setAttribute('width',String(width));
-    highlight.setAttribute('height','68');
+    const scale=work.id===10?1.30:1;
+    const srcX=1271.33,srcY=883;
+    highlight.setAttribute('transform',`translate(${x-srcX} ${y-srcY}) translate(${srcX} ${srcY}) scale(${scale} 1) translate(${-srcX} ${-srcY})`);
   }
   addImage(svg,work);
 }
@@ -122,9 +187,10 @@ async function renderWork(){
   if($('#gallery').hidden)return;
   const work=position(state.activeId);
   if(!work)return;
-  const file=work.status==='Indisponível'?'expografia-ficha-indisponivel-original.svg':'expografia-ficha-disponivel-original.svg';
+  const base=work.status==='Indisponível'?'indisponivel':'disponivel';
+  const file=`expografia-ficha-${base}-${state.theme==='dark'?'escuro':'claro'}${sourceSuffix()}.svg`;
   const container=$('#gallery-svg-container');
-  const ticket=`${work.id}:${work.imageUpdatedAt}:${work.artist}:${work.title}:${work.status}:${work.year}:${work.technique}:${work.dimensions}`;
+  const ticket=`${state.theme}:${work.id}:${work.imageUpdatedAt}:${work.artist}:${work.title}:${work.status}:${work.year}:${work.technique}:${work.dimensions}`;
   if(container.dataset.ticket!==ticket){
     container.dataset.ticket=ticket;
     try{const svg=await loadSvg(file,container);if(container.dataset.ticket!==ticket)return;updateGallerySvg(svg,work);}
@@ -144,26 +210,30 @@ async function renderSettings(){
   const prior=svg.querySelector('[data-dynamic-artists]');if(prior)prior.remove();
   if((cfg.artists||'').trim()!==SEED.settings.artists.trim()){
     const group=el('g',{'data-dynamic-artists':'true'});
-    group.append(el('rect',{x:67,y:403,width:535,height:168,fill:'#ebebeb'}));
-    const t=el('text',{x:71,y:453,style:"font-family:PPNeueMontreal-Book,'PP Neue Montreal',Arial,sans-serif;fill:#000;font-size:32.5px"});
+    group.append(el('rect',{x:67,y:403,width:535,height:168,fill:state.theme==='dark'?'#000':'#ebebeb'}));
+    const t=el('text',{x:71,y:453,style:`font-family:PPNeueMontreal-Book,'PP Neue Montreal',Arial,sans-serif;fill:${state.theme==='dark'?'#ebebeb':'#000'};font-size:32.5px`});
     (cfg.artists||'').split('\n').slice(0,5).forEach((s,i)=>{const span=el('tspan',{x:71,dy:i?'41':'0'});span.textContent=s;t.append(span)});
     group.append(t);svg.append(group);
   }
 }
 function createHotspots(){
   const host=$('#plan-hotspots');
-  MAP_NUMBERS.forEach(([x,y],index)=>{
-    const btn=document.createElement('button');
-    btn.type='button';btn.className='map-hit';btn.dataset.id=String(index+1);
-    const w=index===9?95:70;
-    btn.style.left=`${x/1920*100}%`;
-    btn.style.top=`${y/1080*100}%`;
-    btn.style.width=`${w/1920*100}%`;
-    btn.style.height=`${70/1080*100}%`;
-    btn.setAttribute('aria-label',`Ver obra na posição ${index+1}`);
-    btn.addEventListener('click',()=>go(index+1));host.append(btn);
+  for(let index=0;index<10;index++){
+    for(const [layout,numbers,w,h] of [['desktop',MAP_NUMBERS,1920,1080],['mobile',MOBILE_MAP_NUMBERS,390,844]]){
+      const [x,y]=numbers[index];
+      const btn=document.createElement('button');
+      btn.type='button';btn.className=`map-hit ${layout}`;btn.dataset.id=String(index+1);
+      const width=layout==='mobile'?(index===9?37:29):(index===9?95:70);
+      const height=layout==='mobile'?30:70;
+      btn.style.left=`${x/w*100}%`;
+      btn.style.top=`${y/h*100}%`;
+      btn.style.width=`${width/w*100}%`;
+      btn.style.height=`${height/h*100}%`;
+      btn.setAttribute('aria-label',`Ver obra na posição ${index+1}`);
+      btn.addEventListener('click',()=>go(index+1));host.append(btn);
+    }
     const opt=document.createElement('option');opt.value=String(index+1);opt.textContent=`Obra ${index+1}`;$('#edit-position').append(opt);
-  });
+  }
 }
 function go(id){
   const num=((Number(id)-1+10)%10)+1;
@@ -180,9 +250,24 @@ function showToast(message){
   const t=$('#toast');t.textContent=message;t.classList.add('visible');
   clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>t.classList.remove('visible'),3400);
 }
+async function renderHomeSvg(){
+  const container=$('#home-svg-container');
+  const file=`expografia-capa-${state.theme==='dark'?'escuro':'claro'}${sourceSuffix()}.svg`;
+  if(container.dataset.source===file && container.querySelector('svg'))return;
+  container.dataset.source=file;
+  try{
+    await loadSvg(file,container);
+    if(container.dataset.source===file)renderSettings();
+  }catch(error){console.error(error);showToast('Erro ao carregar o SVG da capa.');}
+}
 function applyTheme(theme){
-  document.documentElement.classList.toggle('dark',theme==='dark');
-  try{localStorage.setItem('mits-theme',theme);}catch{}
+  state.theme=theme==='dark'?'dark':'light';
+  document.documentElement.classList.toggle('dark',state.theme==='dark');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content',state.theme==='dark'?'#000000':'#ebebeb');
+  try{localStorage.setItem('mits-theme',state.theme);}catch{}
+  renderHomeSvg();
+  $('#gallery-svg-container').dataset.ticket='';
+  renderWork();
 }
   async function request(path, opts = {}) {
     let response;
@@ -365,9 +450,8 @@ function applyTheme(theme){
 
 function init(){
   createHotspots();
-  loadSvg('expografia-capa-original.svg',$('#home-svg-container')).then(renderSettings).catch(e=>console.error(e));
   try{applyTheme(localStorage.getItem('mits-theme')||'light');}catch{applyTheme('light');}
-  $('.theme-switch').addEventListener('click',()=>applyTheme(document.documentElement.classList.contains('dark')?'light':'dark'));
+  $$('.theme-switch').forEach(button=>button.addEventListener('click',()=>applyTheme(state.theme==='dark'?'light':'dark')));
   $('.admin-trigger').addEventListener('click',adminAccess);
   $$('[data-close-dialog]').forEach(btn=>btn.addEventListener('click',closeDialog));
   $('#modal-backdrop').addEventListener('click',evt=>{if(evt.target===$('#modal-backdrop'))closeDialog();});
@@ -394,6 +478,13 @@ function init(){
     }
   });
   window.addEventListener('hashchange',openRoute);
+  const onLayoutChange=()=>{
+    $('#home-svg-container').dataset.source='';
+    $('#gallery-svg-container').dataset.ticket='';
+    renderHomeSvg();renderWork();
+  };
+  if(mobileQuery.addEventListener)mobileQuery.addEventListener('change',onLayoutChange);
+  else mobileQuery.addListener(onLayoutChange);
   openRoute();
   loadData();
 }
