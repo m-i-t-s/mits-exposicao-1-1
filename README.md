@@ -1,50 +1,49 @@
-# MITS / 1:1 — site com os SVGs originais da exposição
+# MITS Galeria · 1:1 — Site com os SVGs originais, desktop e mobile
 
-Esta versão utiliza diretamente os **três SVGs enviados pela designer** como composição integral. Não há reconstrução em CSS do desenho, da planta gráfica, dos corpos, da marca ou dos botões. Apenas os campos de obra e as áreas transparentes de interação mudam dinamicamente.
+Este projeto usa diretamente os **12 SVGs enviados**: seis desktop (1920 × 1080) e seis mobile (390 × 844). Não recria a composição com blocos de HTML ou CSS. O JavaScript carrega o SVG correto para o formato de tela e posiciona somente a fotografia, os dados editáveis e as áreas transparentes de interação.
 
-## Arquivos visuais usados
+## Qual arquivo é usado
 
-- `public/assets/expografia-capa-original.svg` — capa original.
-- `public/assets/expografia-ficha-disponivel-original.svg` — ficha original com estado "Disponível".
-- `public/assets/expografia-ficha-indisponivel-original.svg` — ficha original com estado "Indisponível".
+| Tela | Claro | Escuro |
+|---|---|---|
+| Capa desktop | `public/assets/expografia-capa-claro.svg` | `public/assets/expografia-capa-escuro.svg` |
+| Ficha disponível desktop | `public/assets/expografia-ficha-disponivel-claro.svg` | `public/assets/expografia-ficha-disponivel-escuro.svg` |
+| Ficha indisponível desktop | `public/assets/expografia-ficha-indisponivel-claro.svg` | `public/assets/expografia-ficha-indisponivel-escuro.svg` |
+| Capa mobile | `public/assets/expografia-capa-claro-mobile.svg` | `public/assets/expografia-capa-escuro-mobile.svg` |
+| Ficha disponível mobile | `public/assets/expografia-ficha-disponivel-claro-mobile.svg` | `public/assets/expografia-ficha-disponivel-escuro-mobile.svg` |
+| Ficha indisponível mobile | `public/assets/expografia-ficha-indisponivel-claro-mobile.svg` | `public/assets/expografia-ficha-indisponivel-escuro-mobile.svg` |
 
-Ambos os SVGs de ficha possuem o **mapa gráfico definitivo** à direita. Seus números funcionam como seletores das posições 1 a 10; não existe uma planta técnica a ser adicionada ou redesenhada. A fotografia enviada para uma posição aparece dentro do retângulo preto central da ficha e o número correspondente recebe destaque amarelo.
+Em telas verticais com largura até 740 px, o site usa os SVGs mobile. No restante, usa os SVGs desktop. O layout mobile mantém a proporção original de 390 × 844 e aceita rolagem vertical quando a altura do celular for menor. Nenhum botão possui mancha de hover. O mapa é o desenho gráfico final da exposição.
 
-## Fonte: PP Neue Montreal
+## Atualizar o projeto no GitHub/Netlify
 
-Os próprios SVGs especificam **PPNeueMontreal-Book**, **PPNeueMontreal-Medium** e **PPNeueMontreal-Thin**. O arquivo `public/style.css` declara esses três estilos com as mesmas famílias e pesos. **As fontes NÃO estão incluídas no ZIP.** Para que o navegador reproduza fielmente a tipografia, adicione *arquivos webfont de sua própria licença* em `public/fonts/` com os nomes abaixo:
+1. Extraia o ZIP.
+2. Abra `m-i-t-s/mits-exposicao-1-1` no GitHub.
+3. Faça upload **dos arquivos e subpastas** do ZIP preservando a estrutura de diretórios. Na raiz do repositório devem ficar `public/`, `netlify/`, `package.json`, `netlify.toml` e `README.md`. **Não** coloque todos esses itens dentro de uma pasta adicional.
+4. Confirme a substituição dos arquivos de mesmo nome e faça **Commit changes**.
+5. O Netlify, já conectado ao repositório, publica o novo commit automaticamente. Abra o site no celular e confira também o modo escuro.
 
-```
-public/fonts/
-  PPNeueMontreal-Book.woff2      (ou PPNeueMontreal-Book.otf)
-  PPNeueMontreal-Medium.woff2    (ou PPNeueMontreal-Medium.otf)
-  PPNeueMontreal-Thin.woff2      (ou PPNeueMontreal-Thin.otf)
-```
+As variáveis de ambiente `ADMIN_PASSWORD` e `SESSION_SECRET` já cadastradas permanecem no projeto Netlify. Nunca envie seus valores ao GitHub. Os dados armazenados em Netlify Blobs não são substituídos por uma atualização de arquivos estáticos.
 
-Use `.woff2` quando disponível e quando a licença permitir hospedagem na web. Se os arquivos tiverem nomes diferentes, ajuste os caminhos em `public/style.css`, na seção `@font-face`. Sem os arquivos, a página ainda abre, mas o navegador usará uma fonte substituta e alguns textos podem ter medidas diferentes. Não publique fontes em repositório público sem licença de uso e distribuição web.
+## Acesso administrativo
 
-## Atualização do GitHub que já está conectado ao Netlify
+Na **capa**, clique no ícone de perfil: no desktop ele está embaixo, à direita; no mobile ele está **no alto, à direita**. Entre com a senha configurada em `ADMIN_PASSWORD`.
 
-1. Abra seu repositório `m-i-t-s/mits-exposicao-1-1` no GitHub.
-2. Atualize **somente os arquivos alterados** de `public/` usando a versão deste ZIP, preservando `netlify/`, `netlify.toml` e `package.json`. Se preferir, você pode substituir todo o conteúdo do repositório pelo conteúdo deste ZIP: a API foi mantida.
-3. Envie os três arquivos de fontes licenciadas para `public/fonts/` ou corrija os nomes se forem diferentes.
-4. Clique em **Commit changes**. O Netlify deve implantar o novo commit automaticamente.
-5. Atualize a página com Ctrl+F5 e teste capa, navegação pelo mapa, status e edição por senha.
+- Aba **OBRA**: posição 1–10, artista, título, ano, técnica, dimensões, disponibilidade e imagem (JPG/PNG/WebP de até 5 MB).
+- Aba **EXPOSIÇÃO**: curadoria, artistas e e-mail de contato.
 
-O código de autenticação e de armazenamento foi preservado. As variáveis `ADMIN_PASSWORD` e `SESSION_SECRET` que você já cadastrou no Netlify permanecem vinculadas ao projeto. Os dados de obras salvos no mesmo projeto Netlify não são apagados pelo upload do código.
+As dez obras e as fotografias são as mesmas para desktop e mobile; não precisam de dois cadastros. O backend usa funções do Netlify e Netlify Blobs. **O login e a persistência real devem ser validados no Netlify publicado**; os testes locais usaram respostas de exemplo, sem alterar dados do projeto online.
 
-## O que pode ser alterado pelo painel
+## Fontes da MITS
 
-- Obra 1–10: artista, título, ano, técnica, dimensões, status e fotografia JPG/PNG/WebP de até 5 MB.
-- Exposição: texto de curadoria, participantes e e-mail para contato.
-- Estados: Disponível, Reservada, Vendida ou Indisponível.
+A família PP Neue Montreal **não está incluída** no pacote. Mantenha seus arquivos licenciados nas rotas de `public/fonts` mencionadas em `public/style.css`, com os nomes `PPNeueMontreal-Book`, `PPNeueMontreal-Medium` e `PPNeueMontreal-Thin`, no formato `.woff2` ou `.otf`. É necessário ter licença apropriada para hospedar essas fontes publicamente. Se a fonte não for carregada, o navegador poderá mudar as métricas de nomes e outros textos editáveis.
 
-A ilustração, a geometria do mapa, a marca e os componentes originais não são alterados pelo editor. Textos longos podem ser reduzidos **apenas dentro da área reservada à informação**, para evitar que avancem sobre a fotografia.
+## Observação sobre o SVG mobile 09
 
-## Estrutura de publicação
+O SVG original `site expografia claro mobile-09.svg` foi enviado **sem o símbolo M e sem o ícone da lua** no canto superior esquerdo, ao contrário da ficha disponível (08). Ele foi mantido fiel ao arquivo enviado. As áreas de clique continuam disponíveis nas coordenadas correspondentes, mas os ícones não aparecem nessa ficha. Para exibir os ícones, é preferível corrigir o próprio SVG 09 e substituir apenas o respectivo arquivo em `public/assets/`.
 
-O projeto usa `public/` como pasta de publicação e `netlify/functions/` como backend. As funções gravam os dados no Netlify Blobs, protegidas por senha armazenada nas variáveis de ambiente do Netlify. Não é necessário redigitar sua senha nem republicar o site para atualizar uma obra.
+## Verificações feitas
 
-### Testes locais
-
-Para abrir a interface local, use um servidor estático na pasta `public`. Para testar o acesso restrito e os dados reais, use o projeto Netlify publicado ou o Netlify CLI.
+- Sintaxe JavaScript sem erros (`public/app.js` e `netlify/functions/api.mjs`).
+- Navegação desktop e mobile, mapa 1–10, destaque selecionado, número ampliado, modo claro/escuro e abertura do login.
+- Testes em navegador com 390 × 844, 375 × 667 e 1440 × 810 px. Em telas mais baixas, há rolagem vertical.
