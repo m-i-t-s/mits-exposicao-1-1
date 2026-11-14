@@ -29,7 +29,7 @@
         <div class="svg-hotspots" id="plan-hotspots" aria-label="Selecionar obra no mapa gráfico da exposição"></div>
         <button class="svg-hit prev-work" id="previous-work" title="Obra anterior" aria-label="Obra anterior"></button>
         <button class="svg-hit next-work" id="next-work" title="Próxima obra" aria-label="Próxima obra"></button>
-        <button class="svg-hit contact-work" id="contact-button" title="Contato" aria-label="Consultar a galeria sobre esta obra"></button>
+        <a class="svg-hit contact-work" id="contact-button" href="https://api.whatsapp.com/send/?phone=5511944931020" target="_blank" rel="noopener noreferrer" title="Contato pelo WhatsApp" aria-label="Abrir o WhatsApp da MITS Galeria"></a>
         <button class="svg-hit gallery-home" id="back-home" title="Voltar à capa" aria-label="Voltar à capa"></button>
         <button class="svg-hit gallery-theme theme-switch" title="Alternar modo claro e escuro" aria-label="Alternar modo claro e escuro"></button>
       </div>
@@ -75,21 +75,13 @@
       <form id="edit-settings-form" hidden>
         <label for="edit-curator">Texto de curadoria<input id="edit-curator" name="curator" maxlength="240"></label>
         <label for="edit-artists">Artistas participantes (um por linha)<textarea id="edit-artists" name="artists" rows="4" maxlength="1500"></textarea></label>
-        <label for="edit-email">E-mail para o botão CONTATO<input id="edit-email" name="contactEmail" type="email" placeholder="galeria@dominio.com" maxlength="240"></label>
         <p class="note">As alterações aparecerão para os visitantes após salvar.</p>
         <button class="primary-action" type="submit" id="save-settings">SALVAR EXPOSIÇÃO</button>
       </form>
       <p id="editor-message" class="editor-message" role="status" aria-live="polite"></p>
     </div>
 
-    <div id="contact-dialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="contact-title" hidden>
-      <button type="button" class="dialog-close" data-close-dialog aria-label="Fechar">×</button>
-      <p class="eyebrow">MITS GALERIA</p>
-      <h2 id="contact-title">Contato</h2>
-      <p id="contact-description">Entre em contato sobre a obra selecionada.</p>
-      <a href="#" id="contact-email-link" class="primary-action">ENVIAR E-MAIL</a>
-      <p class="note" id="contact-not-configured" hidden>A galeria ainda não cadastrou o e-mail de atendimento. Configure-o pelo acesso restrito.</p>
-    </div>
+
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>

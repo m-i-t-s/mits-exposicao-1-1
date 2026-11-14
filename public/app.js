@@ -8,7 +8,7 @@ const SEED = {
   settings: {curator:'Curadoria de Lara Maia',artists:'Beatriz Lindenberg\nFyodor Pavlov-Andreevich\nAline Setton',contactEmail:''},
   artworks: Array.from({length:10},(_,i)=>({id:i+1,artist:'Nome artista',title:'Nome obra',year:'Ano obra',technique:'Técnica obra',dimensions:'Dimensões obra',status:'Disponível',imageUpdatedAt:null}))
 };
-const state={data:structuredClone(SEED),activeId:1,authenticated:false,online:false,currentDialog:null,theme:'light'};
+const state={data:structuredClone(SEED),activeId:1,authenticated:false,online:false,serverError:null,currentDialog:null,theme:'light'};
 // Coordenadas extraídas dos números desenhados na ficha vetorial, em 1920×1080.
 const MAP_NUMBERS = [[1271.33,883],[1223,700],[1324,549],[1223,395],[1223,188],[1304,134],[1393,188],[1499,134],[1569,188],[1560,390]];
 // Centros das posições numeradas, lidos do SVG de 390 x 844 da designer.
@@ -162,6 +162,17 @@ function updateGallerySvg(svg,work){
       const scale=110/bbox.height;
       const copied=source.cloneNode(true);
       copied.removeAttribute('id');
+      // Os números do mapa usam amarelo; o número grande da ficha usa
+      // a MESMA cor do original "1" da designer (preto / cinza-claro).
+      // É somente uma correção de pintura do clone, não do SVG original.
+      const numberColor=state.theme==='dark'?'#ebebeb':'#000000';
+      const elements=[copied,...copied.querySelectorAll('*')];
+      for(const part of elements){
+        if(part.matches('path,polygon,rect,text,use')){
+          part.style.setProperty('fill',numberColor,'important');
+          part.style.setProperty('stroke','none','important');
+        }
+      }
       const wrapper=el('g',{transform:`translate(${95-bbox.x*scale} ${82.33-bbox.y*scale}) scale(${scale})`});
       wrapper.append(copied);g.append(wrapper);
     }
@@ -264,6 +275,10 @@ function applyTheme(theme){
   state.theme=theme==='dark'?'dark':'light';
   document.documentElement.classList.toggle('dark',state.theme==='dark');
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content',state.theme==='dark'?'#000000':'#ebebeb');
+  $$('.theme-switch').forEach(button=>{
+    button.setAttribute('aria-label', state.theme==='dark'?'Ativar modo claro':'Ativar modo escuro');
+    button.title=state.theme==='dark'?'Ativar modo claro':'Ativar modo escuro';
+  });
   try{localStorage.setItem('mits-theme',state.theme);}catch{}
   renderHomeSvg();
   $('#gallery-svg-container').dataset.ticket='';
@@ -286,16 +301,20 @@ function applyTheme(theme){
       if (!Array.isArray(content.artworks) || content.artworks.length !== 10) throw Error('Dados incompletos');
       state.data = content;
       state.online = true;
+      state.serverError = null;
       renderSettings();
       renderWork();
+      return true;
     } catch (err) {
       state.online = false;
-      console.warn('Prévia local: dados de demonstração. Para editar, publique no Netlify.', err.message);
+      state.serverError = err.message;
+      console.warn('Não foi possível obter /api/data:', err.message);
+      return false;
     }
   }
   function closeDialog() {
     $('#modal-backdrop').hidden = true;
-    ['login-dialog','editor-dialog','contact-dialog'].forEach(id => $(`#${id}`).hidden = true);
+    ['login-dialog','editor-dialog'].forEach(id => $(`#${id}`).hidden = true);
     state.currentDialog = null;
     document.body.style.overflow = '';
   }
@@ -310,8 +329,9 @@ function applyTheme(theme){
     if (field) field.focus();
   }
   async function adminAccess() {
-    if (!state.online) {
-      showToast('A edição precisa de uma publicação no Netlify.');
+    if (!state.online && !(await loadData())) {
+      const reason=state.serverError||'API indisponível';
+      showToast(`A administração não está disponível: ${reason}. Confira /api/data e as Functions no Netlify.`);
       return;
     }
     try {
@@ -348,7 +368,6 @@ function applyTheme(theme){
     const cfg = state.data.settings;
     $('#edit-curator').value = cfg.curator || '';
     $('#edit-artists').value = cfg.artists || '';
-    $('#edit-email').value = cfg.contactEmail || '';
     $('#edit-position').value = String(state.activeId);
     fillWorkForm();
     setAdminTab('work');
@@ -419,7 +438,7 @@ function applyTheme(theme){
       const cfg = {
         curator: $('#edit-curator').value.trim(),
         artists: $('#edit-artists').value.trim(),
-        contactEmail: $('#edit-email').value.trim()
+        contactEmail: state.data.settings.contactEmail || '' // compatibilidade com dados antigos
       };
       const result = await request('save', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'settings',settings:cfg})});
       state.data.settings = result.settings;
@@ -429,23 +448,6 @@ function applyTheme(theme){
     } catch (err) {
       $('#editor-message').textContent = `Não foi possível salvar. ${err.message}`;
     } finally {btn.disabled = false;}
-  }
-  function contact() {
-    const work = position(state.activeId);
-    const cfg = state.data.settings;
-    setContent('#contact-description', `Para consultar a obra ${work.id}, “${work.title}”, de ${work.artist}, entre em contato com a MITS Galeria.`);
-    const email = cfg.contactEmail;
-    if (email && /^\S+@\S+\.\S+$/.test(email)) {
-      $('#contact-email-link').hidden = false;
-      $('#contact-not-configured').hidden = true;
-      const subject = `Consulta sobre a obra ${work.id} — ${work.title} | 1:1`;
-      const body = `Olá, gostaria de informações sobre a obra ${work.id}, “${work.title}”, de ${work.artist}, na exposição 1:1.`;
-      $('#contact-email-link').href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    } else {
-      $('#contact-email-link').hidden = true;
-      $('#contact-not-configured').hidden = false;
-    }
-    openDialog('contact');
   }
 
 function init(){
@@ -459,7 +461,6 @@ function init(){
   $('#back-home').addEventListener('click',()=>location.hash='inicio');
   $('#previous-work').addEventListener('click',()=>go(state.activeId-1));
   $('#next-work').addEventListener('click',()=>go(state.activeId+1));
-  $('#contact-button').addEventListener('click',contact);
   $('#login-form').addEventListener('submit',login);
   $('#edit-work-form').addEventListener('submit',saveWork);
   $('#edit-settings-form').addEventListener('submit',saveSettings);
