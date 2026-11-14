@@ -76,13 +76,22 @@
     fitText(target,limit,minSize);
   }
   function addPhoto(svg,entry,mobile){
+    // O retângulo de referência foi REMOVIDO dos SVGs finais pela designer.
+    // Mantemos exatamente a posição e o tamanho anteriores como área
+    // invisível de enquadramento, sem pintar fundo nem bordas.
+    // Sem fotografia cadastrada, não criamos NENHUM elemento nesta região.
     if(!entry.imageUpdatedAt)return;
-    const frame=mobile?{x:167.38,y:479.61,w:194.33,h:242.91}:{x:455.67,y:82.33,w:504.33,h:630.42};
-    const rect=[...svg.querySelectorAll('rect')].find(r=>Math.abs(Number(r.getAttribute('x'))-frame.x)<.08 && Math.abs(Number(r.getAttribute('y'))-frame.y)<.08);
-    if(!rect)return;
-    const image=svgEl('image',{x:frame.x,y:frame.y,width:frame.w,height:frame.h,preserveAspectRatio:'xMidYMid meet'});
+    const frame=mobile
+      ?{x:167.38,y:479.61,w:194.33,h:242.91}
+      :{x:455.67,y:82.33,w:504.33,h:630.42};
+    const image=svgEl('image',{
+      x:frame.x,y:frame.y,width:frame.w,height:frame.h,
+      preserveAspectRatio:'xMidYMid meet',
+      'data-artwork-image':String(entry.id)
+    });
     image.setAttribute('href',`/api/image/${entry.id}?v=${encodeURIComponent(entry.imageUpdatedAt)}`);
-    rect.after(image);
+    // A imagem fica na camada de conteúdo, sem qualquer retângulo de apoio.
+    svg.append(image);
   }
   function addStatus(svg,entry,mobile){
     if(entry.status==='Disponível'||entry.status==='Indisponível')return;
