@@ -1,89 +1,81 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#ebebeb">
-  <meta name="description" content="1:1 — exposição na MITS Galeria com curadoria de Lara Maia.">
-  <title>1:1 — MITS Galeria</title>
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/style.css">
-  <script defer src="/app.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ebebeb">
+<meta name="description" content="1:1, exposição da MITS Galeria. Explore as obras e sua localização na exposição.">
+<title>1:1 — MITS Galeria</title>
+<link rel="stylesheet" href="/style.css">
+<script defer src="/app.js"></script>
 </head>
 <body>
-  <main id="app">
-    <section id="home" class="screen" aria-label="1:1, apresentação da exposição">
-      <div class="artboard" id="home-artboard">
-        <!-- O SVG inteiro é carregado aqui, sem reconstrução em HTML/CSS. -->
-        <div id="home-svg-container" class="original-svg"></div>
-        <button class="svg-hit home-next" id="enter-gallery" title="Explorar a exposição" aria-label="Explorar as obras"></button>
-        <button class="svg-hit home-theme theme-switch" title="Alternar modo claro e escuro" aria-label="Alternar modo noturno"></button>
-        <button class="svg-hit home-admin admin-trigger" title="Acesso restrito da equipe" aria-label="Acesso restrito da equipe"></button>
-      </div>
-    </section>
-
-    <section id="gallery" class="screen" aria-label="Obras da exposição" hidden>
-      <div class="artboard" id="gallery-artboard">
-        <!-- Ficha criada diretamente do SVG original. -->
-        <div id="gallery-svg-container" class="original-svg"></div>
-        <div class="svg-hotspots" id="plan-hotspots" aria-label="Selecionar obra no mapa gráfico da exposição"></div>
-        <button class="svg-hit prev-work" id="previous-work" title="Obra anterior" aria-label="Obra anterior"></button>
-        <button class="svg-hit next-work" id="next-work" title="Próxima obra" aria-label="Próxima obra"></button>
-        <a class="svg-hit contact-work" id="contact-button" href="https://api.whatsapp.com/send/?phone=5511944931020" target="_blank" rel="noopener noreferrer" title="Contato pelo WhatsApp" aria-label="Abrir o WhatsApp da MITS Galeria"></a>
-        <button class="svg-hit gallery-home" id="back-home" title="Voltar à capa" aria-label="Voltar à capa"></button>
-        <button class="svg-hit gallery-theme theme-switch" title="Alternar modo claro e escuro" aria-label="Alternar modo claro e escuro"></button>
-      </div>
-    </section>
-  </main>
-
-  <div id="modal-backdrop" class="modal-backdrop" hidden>
-    <div id="login-dialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="login-title" hidden>
-      <button type="button" class="dialog-close" data-close-dialog aria-label="Fechar">×</button>
-      <p class="eyebrow">MITS / EQUIPE</p>
-      <h2 id="login-title">Acesso restrito</h2>
-      <p>Entre com a senha da galeria para editar as fichas e fotografias das obras.</p>
-      <form id="login-form">
-        <label for="password">Senha</label>
-        <input id="password" type="password" name="password" autocomplete="current-password" required>
-        <p class="form-error" id="login-error" role="alert" hidden></p>
-        <button class="primary-action" type="submit">ENTRAR</button>
-      </form>
+<main id="site">
+  <section class="screen" id="home" aria-label="Apresentação da exposição 1:1">
+    <div class="artboard">
+      <div id="home-art" class="svg-art" aria-hidden="true"></div>
+      <button class="hit home-next" id="enter" title="Explorar a exposição" aria-label="Explorar as obras"></button>
+      <button class="hit home-theme theme-toggle" title="Alternar modo claro e escuro" aria-label="Alternar modo claro e escuro"></button>
+      <button class="hit home-profile admin-trigger" title="Acesso restrito" aria-label="Acesso restrito da galeria"></button>
     </div>
-
-    <div id="editor-dialog" class="dialog editor-dialog" role="dialog" aria-modal="true" aria-labelledby="editor-title" hidden>
-      <button type="button" class="dialog-close" data-close-dialog aria-label="Fechar">×</button>
-      <p class="eyebrow">MITS / ADMINISTRAÇÃO</p>
-      <div class="editor-title-line"><h2 id="editor-title">Editar exposição</h2><button type="button" class="subtle-button" id="logout">Sair</button></div>
-      <div class="admin-tabs" role="tablist" aria-label="Área de edição">
-        <button id="tab-work" type="button" role="tab" aria-selected="true">OBRA</button>
-        <button id="tab-settings" type="button" role="tab" aria-selected="false">EXPOSIÇÃO</button>
-      </div>
-      <form id="edit-work-form">
-        <div class="form-row">
-          <label for="edit-position">Posição na planta<select name="id" id="edit-position"></select></label>
-          <label for="edit-status">Status<select name="status" id="edit-status"><option>Disponível</option><option>Reservada</option><option>Vendida</option><option>Indisponível</option></select></label>
-        </div>
-        <label for="edit-artist">Artista<input name="artist" id="edit-artist" maxlength="180" required></label>
-        <label for="edit-title">Título da obra<input name="title" id="edit-title" maxlength="240" required></label>
-        <div class="form-row"><label for="edit-year">Ano<input name="year" id="edit-year" maxlength="80"></label><label for="edit-dimensions">Dimensões<input name="dimensions" id="edit-dimensions" maxlength="200"></label></div>
-        <label for="edit-technique">Técnica<input name="technique" id="edit-technique" maxlength="400"></label>
-        <label for="edit-image">Imagem da obra (JPG, PNG ou WebP, até 5 MB)<input name="image" id="edit-image" type="file" accept="image/jpeg,image/png,image/webp"></label>
-        <p class="note" id="image-admin-note">A imagem atual será mantida se você não selecionar outro arquivo.</p>
-        <label class="checkbox-line"><input type="checkbox" name="removeImage" id="edit-remove-image"> Remover imagem atual</label>
-        <button class="primary-action" type="submit" id="save-work">SALVAR OBRA</button>
-      </form>
-      <form id="edit-settings-form" hidden>
-        <label for="edit-curator">Texto de curadoria<input id="edit-curator" name="curator" maxlength="240"></label>
-        <label for="edit-artists">Artistas participantes (um por linha)<textarea id="edit-artists" name="artists" rows="4" maxlength="1500"></textarea></label>
-        <p class="note">As alterações aparecerão para os visitantes após salvar.</p>
-        <button class="primary-action" type="submit" id="save-settings">SALVAR EXPOSIÇÃO</button>
-      </form>
-      <p id="editor-message" class="editor-message" role="status" aria-live="polite"></p>
+  </section>
+  <section class="screen" id="gallery" aria-label="Obras da exposição" hidden>
+    <div class="artboard">
+      <div id="work-art" class="svg-art" aria-hidden="true"></div>
+      <div id="map-hotspots" class="hotspots" aria-label="Selecionar obra pela posição no mapa"></div>
+      <button class="hit work-previous" id="previous" title="Obra anterior" aria-label="Obra anterior"></button>
+      <a class="hit work-contact" id="contact" href="https://api.whatsapp.com/send/?phone=5511944931020" target="_blank" rel="noopener noreferrer" aria-label="Entrar em contato com a MITS Galeria pelo WhatsApp" title="Contato pelo WhatsApp"></a>
+      <button class="hit work-next" id="next" title="Próxima obra" aria-label="Próxima obra"></button>
+      <button class="hit gallery-theme theme-toggle" title="Alternar modo claro e escuro" aria-label="Alternar modo claro e escuro"></button>
+      <button class="hit gallery-home" id="back-home" title="Voltar à apresentação" aria-label="Voltar ao início"></button>
     </div>
-
-
-  </div>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </section>
+</main>
+<div class="overlay" id="overlay" hidden>
+  <section class="modal" id="login-dialog" role="dialog" aria-modal="true" aria-labelledby="login-title" hidden>
+    <button class="close" data-close aria-label="Fechar painel">×</button>
+    <p class="eyebrow">MITS / EQUIPE</p>
+    <h2 id="login-title">Acesso restrito</h2>
+    <p>Digite a senha da galeria para editar as obras.</p>
+    <form id="login-form" class="form" autocomplete="on">
+      <label for="admin-pass">Senha</label>
+      <input id="admin-pass" name="password" type="password" autocomplete="current-password" required>
+      <p id="login-error" class="error" role="alert" hidden></p>
+      <button class="primary" type="submit">ENTRAR</button>
+    </form>
+  </section>
+  <section class="modal editor" id="editor-dialog" role="dialog" aria-modal="true" aria-labelledby="editor-title" hidden>
+    <button class="close" data-close aria-label="Fechar painel">×</button>
+    <p class="eyebrow">MITS / ADMINISTRAÇÃO</p>
+    <div class="modal-heading"><h2 id="editor-title">Editar exposição</h2><button type="button" class="text-button" id="logout">Sair</button></div>
+    <div class="tabs" role="tablist" aria-label="Tipos de edição">
+      <button id="tab-work" type="button" role="tab" aria-selected="true">OBRA</button>
+      <button id="tab-exhibition" type="button" role="tab" aria-selected="false">EXPOSIÇÃO</button>
+    </div>
+    <form id="edit-work" class="form">
+      <div class="fields-two">
+        <label>Posição na planta<select id="position" name="id"></select></label>
+        <label>Disponibilidade<select id="status" name="status"><option>Disponível</option><option>Reservada</option><option>Vendida</option><option>Indisponível</option></select></label>
+      </div>
+      <label>Artista<input id="artist" name="artist" maxlength="180" required></label>
+      <label>Título da obra<input id="title" name="title" maxlength="240" required></label>
+      <div class="fields-two"><label>Ano<input id="year" name="year" maxlength="80"></label><label>Valor (como será exibido)<input id="price" name="price" maxlength="120" placeholder="Ex.: R$ 12.000 ou Sob consulta"></label></div>
+      <label>Técnica<input id="technique" name="technique" maxlength="400"></label>
+      <label>Dimensões<input id="dimensions" name="dimensions" maxlength="200"></label>
+      <label>Fotografia da obra (JPG, PNG ou WebP, até 5 MB)<input type="file" id="photo" name="image" accept="image/jpeg,image/png,image/webp"></label>
+      <p id="image-note" class="note">A imagem atual será mantida se nenhuma outra for escolhida.</p>
+      <label class="check"><input type="checkbox" id="remove-photo" name="removeImage"> Remover imagem existente</label>
+      <button id="save-work" class="primary" type="submit">SALVAR OBRA</button>
+    </form>
+    <form id="edit-exhibition" class="form" hidden>
+      <label>Crédito de curadoria<input id="curator" name="curator" maxlength="240"></label>
+      <label>Artistas participantes (um por linha)<textarea id="artists-list" name="artists" rows="4" maxlength="1500"></textarea></label>
+      <p class="note">O botão CONTATO abre o WhatsApp da MITS Galeria.</p>
+      <button id="save-exhibition" class="primary" type="submit">SALVAR EXPOSIÇÃO</button>
+    </form>
+    <p id="save-message" class="message" role="status" aria-live="polite"></p>
+  </section>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

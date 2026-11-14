@@ -1,90 +1,24 @@
-/* 1:1 — o layout visual é o SVG ORIGINAL, sem reprodução em CSS. */
-@font-face {font-family:'PP Neue Montreal';src:url('/fonts/PPNeueMontreal-Book.woff2') format('woff2'),url('/fonts/PPNeueMontreal-Book.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}
-@font-face {font-family:'PP Neue Montreal';src:url('/fonts/PPNeueMontreal-Medium.woff2') format('woff2'),url('/fonts/PPNeueMontreal-Medium.otf') format('opentype');font-weight:500;font-style:normal;font-display:swap;}
-@font-face {font-family:'PP Neue Montreal';src:url('/fonts/PPNeueMontreal-Thin.woff2') format('woff2'),url('/fonts/PPNeueMontreal-Thin.otf') format('opentype');font-weight:200;font-style:normal;font-display:swap;}
-@font-face {font-family:'PPNeueMontreal-Book';src:url('/fonts/PPNeueMontreal-Book.woff2') format('woff2'),url('/fonts/PPNeueMontreal-Book.otf') format('opentype');font-style:normal;font-display:swap;}
-@font-face {font-family:'PPNeueMontreal-Medium';src:url('/fonts/PPNeueMontreal-Medium.woff2') format('woff2'),url('/fonts/PPNeueMontreal-Medium.otf') format('opentype');font-style:normal;font-display:swap;}
-@font-face {font-family:'PPNeueMontreal-Thin';src:url('/fonts/PPNeueMontreal-Thin.woff2') format('woff2'),url('/fonts/PPNeueMontreal-Thin.otf') format('opentype');font-style:normal;font-display:swap;}
-:root {--page:#ebebeb;--ink:#000;--yellow:#ff0;--muted:#5e5e5e;--input:white;font-family:'PP Neue Montreal',Arial,sans-serif;background:var(--page);color:var(--ink);font-synthesis:none}
-:root.dark {--page:#000;--ink:#ebebeb;--muted:#aaa;--input:#252525;}
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%;}
-body{background:var(--page);color:var(--ink);}
-button,input,textarea,select{font:inherit}
-button{cursor:pointer}
-a{color:inherit}
-[hidden]{display:none!important}
-.screen {min-height:100svh; display:flex; align-items:center; justify-content:center;}
-.artboard {width:min(100vw,177.7778svh); aspect-ratio:16/9; position:relative;flex:none;}
-.original-svg {position:absolute;inset:0;pointer-events:none;}
-.original-svg svg {display:block;width:100%;height:100%;}
-/* Botões são transparentes; suas coordenadas correspondem exatamente ao viewBox 1920×1080. */
-.svg-hit,.map-hit {display:block;position:absolute;border:0;padding:0;background:transparent;color:transparent;}
-.svg-hit:focus-visible,.map-hit:focus-visible {outline:3px solid #ff0;outline-offset:2px;}
-/* Sem manchas de hover: os SVGs são preservados integralmente. */
-.home-next{left:60.1%;top:37%;width:6.4%;height:18.2%;}
-.home-theme{left:3.2%;top:87.3%;width:3.7%;height:7%;}
-.home-admin{left:93.5%;top:87.5%;width:4%;height:8%;}
-.prev-work{left:4.92%;top:84.9%;width:4.2%;height:7.5%;}
-.next-work{left:45.8%;top:84.9%;width:4.2%;height:7.5%;}
-.contact-work{left:9.7%;top:84.9%;width:35.55%;height:7.5%;}
-.gallery-home{left:90.4%;top:5.3%;width:6.5%;height:11%;}
-.gallery-theme{left:92.4%;top:88.8%;width:5.6%;height:8%;}
-.svg-hotspots{position:absolute;inset:0;pointer-events:none;}
-.map-hit{pointer-events:auto;min-width:28px;min-height:28px;transform:translate(-50%,-50%);}
-/* Modo escuro usa os próprios SVGs originais enviados, nunca filtros de inversão. */
-/* Hotspots divididos por arte: desktop (1920x1080) e mobile (390x844). */
-.map-hit.mobile{display:none;}
-/* O próprio SVG mobile determina a posição de cada elemento. */
+@font-face{font-family:PPNeueMontreal-Book;src:url('/fonts/PPNeueMontreal-Book.woff2') format('woff2'),url('/fonts/PPNeueMontreal-Book.otf') format('opentype'),url('/fonts/ppneuemontreal-book.otf') format('opentype');font-display:swap}
+@font-face{font-family:PPNeueMontreal-Medium;src:url('/fonts/PPNeueMontreal-Medium.woff2') format('woff2'),url('/fonts/PPNeueMontreal-Medium.otf') format('opentype'),url('/fonts/ppneuemontreal-medium.otf') format('opentype');font-display:swap}
+@font-face{font-family:PPNeueMontreal-Thin;src:url('/fonts/PPNeueMontreal-Thin.woff2') format('woff2'),url('/fonts/PPNeueMontreal-Thin.otf') format('opentype'),url('/fonts/ppneuemontreal-thin.otf') format('opentype');font-display:swap}
+:root{--page:#ebebeb;--ink:#050505;--panel:#f5f5f5;--yellow:#ffff00;--muted:#555;--input:#fff;background:var(--page);color:var(--ink);font-family:'PPNeueMontreal-Book',Arial,Helvetica,sans-serif;font-synthesis:none}
+:root.dark{--page:#000;--ink:#ebebeb;--panel:#161616;--muted:#aaa;--input:#222}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;overflow-x:hidden}body{background:var(--page);color:var(--ink)}button,input,textarea,select{font:inherit}button{cursor:pointer}a{color:inherit}[hidden]{display:none!important}
+.screen{display:flex;justify-content:center;align-items:center;min-height:100svh}
+.artboard{width:min(100vw,177.7777778svh);aspect-ratio:16/9;position:relative;flex:none}
+.svg-art{position:absolute;inset:0;pointer-events:none}.svg-art svg{display:block;width:100%;height:100%}
+.hit,.map-hit{position:absolute;display:block;border:0;padding:0;background:transparent;text-decoration:none;color:transparent;cursor:pointer}
+.hit:focus-visible,.map-hit:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.hotspots{position:absolute;inset:0;pointer-events:none}.map-hit{pointer-events:auto;transform:translate(-50%,-50%);min-width:26px;min-height:26px}
+.map-hit.mobile{display:none}
+.home-next{left:60.1%;top:37%;width:6.4%;height:18.2%}.home-theme{left:3.2%;top:87.3%;width:3.7%;height:7%}.home-profile{left:93.5%;top:87.5%;width:4%;height:8%}
+.work-previous{left:4.92%;top:84.9%;width:4.2%;height:7.5%}.work-contact{left:9.7%;top:84.9%;width:35.55%;height:7.5%}.work-next{left:45.8%;top:84.9%;width:4.2%;height:7.5%}.gallery-home{left:90.4%;top:5.3%;width:6.5%;height:11%}.gallery-theme{left:92.4%;top:88.8%;width:5.6%;height:8%}
 @media(max-width:740px) and (orientation:portrait){
-  html,body{width:100%;overflow-x:hidden;}
-  .screen{align-items:flex-start;justify-content:center;min-height:100svh;}
-  .artboard{width:100vw;aspect-ratio:390/844;height:auto;flex:none;}
-  .map-hit.desktop{display:none;}
-  .map-hit.mobile{display:block;}
-  .home-next{left:18.2%;top:50.5%;width:14%;height:10%;}
-  .home-theme{left:3.3%;top:2.9%;width:10.5%;height:6.9%;}
-  .home-admin{left:85%;top:2.8%;width:12%;height:7%;}
-  .prev-work{left:6.8%;top:91.7%;width:9.3%;height:4.9%;}
-  .next-work{left:84.1%;top:91.7%;width:9.3%;height:4.9%;}
-  .contact-work{left:15.5%;top:91.7%;width:69.1%;height:4.9%;}
-  .gallery-home{left:5.8%;top:2.5%;width:11.3%;height:6.2%;}
-  .gallery-theme{left:6.3%;top:10.1%;width:10%;height:5.5%;}
-  .map-hit{min-width:25px;min-height:25px;}
-  .modal-backdrop{width:100vw;}
+ .screen{align-items:flex-start;justify-content:center;min-height:100svh}
+ .artboard{width:100vw;aspect-ratio:390/844;height:auto;flex:none}
+ .map-hit.desktop{display:none}.map-hit.mobile{display:block}
+ .home-next{left:18.2%;top:50.5%;width:14%;height:10%}.home-theme{left:3.3%;top:2.9%;width:10.5%;height:6.9%}.home-profile{left:85%;top:2.8%;width:12%;height:7%}
+ .work-previous{left:6.8%;top:91.7%;width:9.3%;height:4.9%}.work-contact{left:15.5%;top:91.7%;width:69.1%;height:4.9%}.work-next{left:84.1%;top:91.7%;width:9.3%;height:4.9%}.gallery-home{left:5.8%;top:2.5%;width:11.3%;height:6.2%}.gallery-theme{left:6.3%;top:10.1%;width:10%;height:5.5%}
 }
-/* Modais */
-.modal-backdrop { position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:99;display:grid;place-items:center;padding:24px; }
-.dialog { width:min(100%,500px);max-height:min(90svh,1000px);overflow:auto;background:var(--page);color:var(--ink);padding:38px 42px 40px;position:relative; box-shadow:0 15px 55px rgba(0,0,0,.18); }
-.dialog h2 { margin:7px 0 20px;font-size:clamp(32px,4vw,48px);font-weight:600;letter-spacing:-.06em;line-height:1; }
-.dialog p { line-height:1.35; }
-.dialog .eyebrow {font-size:12px;letter-spacing:.18em;font-weight:600;margin:0;}
-.dialog-close {position:absolute;right:18px;top:10px;font-size:36px;font-weight:200;color:var(--ink);border:0;background:none; }
-.dialog form {display:flex;flex-direction:column;gap:15px;margin-top:26px;}
-.dialog label {display:flex;flex-direction:column;gap:7px;font-size:14px;font-weight:550;}
-.dialog input:not([type="checkbox"]),.dialog select,.dialog textarea {width:100%;background:var(--input);color:var(--ink);border:1px solid var(--muted);padding:12px;border-radius:0;font-size:16px;}
-.dialog input[type=file] {font-size:12px;max-width:100%;}
-.dialog select {appearance:auto;}
-.dialog input:focus-visible,.dialog textarea:focus-visible {outline:2px solid var(--yellow);outline-offset:0;}
-.dialog .form-row {display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.dialog .checkbox-line {display:flex; flex-direction:row;align-items:center;gap:10px;font-size:14px;font-weight:400;}
-.primary-action {display:block;text-align:center;text-decoration:none;background:var(--yellow);border:2px solid #000;color:#000;padding:13px 18px;font-weight:600;font-size:16px;}
-.primary-action:hover {filter:brightness(.9)}
-.primary-action:disabled {opacity:.6;cursor:wait;}
-.form-error {color:#c72929;font-size:13px;margin:0;}
-.dialog .note {color:var(--muted);font-size:13px;margin:0;}
-.editor-dialog {width:min(100%,670px);padding:30px 36px;}
-.editor-title-line {display:flex;align-items:center;justify-content:space-between;gap:15px;}
-.editor-title-line h2 {margin-bottom:12px;}
-.subtle-button {background:none;border:0;text-decoration:underline;color:var(--ink);}
-.admin-tabs {display:flex;border-bottom:1px solid var(--muted);margin:10px 0 16px;gap:25px;}
-.admin-tabs button {padding:11px 0;background:none;border:0;color:var(--muted);font-weight:600;letter-spacing:.06em;font-size:13px;}
-.admin-tabs button[aria-selected="true"] {border-bottom:4px solid var(--yellow);color:var(--ink);}
-.editor-dialog form {margin-top:12px;gap:13px;}
-.editor-message {color:var(--ink);font-size:13px;min-height:14px;margin:12px 0 0;}
-.toast {position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--page);padding:12px 18px;z-index:120;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;}
-.toast.visible {opacity:1;}
-
-
-@media(max-width:740px){.dialog{padding:32px 22px 24px}.dialog .form-row{grid-template-columns:1fr}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+.overlay{position:fixed;inset:0;display:grid;place-items:center;z-index:100;overflow-y:auto;background:rgba(0,0,0,.65);padding:22px}.modal{position:relative;background:var(--page);color:var(--ink);width:min(100%,510px);padding:38px 42px;max-height:90svh;overflow-y:auto;box-shadow:0 18px 45px rgba(0,0,0,.2)}.modal.editor{width:min(100%,690px);padding:32px 38px}.modal h2{font-size:clamp(30px,4vw,46px);line-height:1.05;letter-spacing:-.055em;font-weight:600;margin:8px 0 20px}.modal p{line-height:1.4}.eyebrow{font-size:12px;letter-spacing:.16em;font-weight:700;margin:0}.close{position:absolute;top:8px;right:16px;color:var(--ink);border:0;background:none;font-size:36px;font-weight:200}.modal-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.text-button{background:none;color:var(--ink);border:0;text-decoration:underline}.form{display:flex;flex-direction:column;gap:13px;margin-top:22px}.form label{display:flex;flex-direction:column;gap:7px;font-size:14px;font-weight:550}.form input:not([type='checkbox']),.form select,.form textarea{background:var(--input);color:var(--ink);border:1px solid var(--muted);padding:11px;width:100%;font-size:15px;border-radius:0}.form input:focus,.form textarea:focus{outline:2px solid var(--yellow)}.form input[type=file]{max-width:100%;font-size:12px}.form .fields-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.form .check{flex-direction:row;align-items:center;font-weight:400;gap:8px}.primary{background:var(--yellow);border:2px solid #000;color:#000;padding:12px;font-weight:650;letter-spacing:.02em}.primary:disabled{opacity:.5;cursor:wait}.tabs{display:flex;gap:25px;border-bottom:1px solid var(--muted)}.tabs button{border:0;background:none;color:var(--muted);padding:12px 1px;font-weight:650}.tabs button[aria-selected='true']{border-bottom:4px solid var(--yellow);color:var(--ink)}.note{font-size:13px;color:var(--muted);margin:0}.error{font-size:13px;color:#b82424;margin:0}.message{font-size:14px;margin:12px 0 0;min-height:20px}.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 18px;max-width:min(520px,90vw);background:var(--ink);color:var(--page);z-index:110;opacity:0;pointer-events:none;transition:opacity .2s;font-size:13px}.toast.visible{opacity:1}
+@media(max-width:650px){.modal,.modal.editor{padding:30px 22px}.form .fields-two{grid-template-columns:1fr}}
