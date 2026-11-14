@@ -189,16 +189,13 @@
   </g>
   <polygon points="46.84 801.52 38.58 793.25 46.84 784.99 47.94 786.08 40.76 793.25 47.94 800.43 46.84 801.52"/>
   <polygon points="343.16 801.52 342.06 800.43 349.24 793.25 342.06 786.08 343.16 784.99 351.42 793.25 343.16 801.52"/>
-  <g>
-    <text class="cls-6" transform="translate(28.29 599.31)"><tspan class="cls-15" x="0" y="0">N</tspan><tspan x="10.68" y="0">ome ob</tspan><tspan class="cls-10" x="60.26" y="0">r</tspan><tspan x="64.95" y="0">a</tspan></text>
-    <text class="cls-4" transform="translate(28.29 616.86)"><tspan x="0" y="0">Ano ob</tspan><tspan class="cls-13" x="41.05" y="0">r</tspan><tspan x="45.15" y="0">a</tspan></text>
-    <text class="cls-5" transform="translate(28.29 671.19)"><tspan class="cls-1" x="0" y="0">T</tspan><tspan x="5.14" y="0">ecnica ob</tspan><tspan class="cls-14" x="51.66" y="0">r</tspan><tspan x="54.81" y="0">a</tspan></text>
-    <text class="cls-5" transform="translate(28.29 685.04)"><tspan x="0" y="0">Dimensoes ob</tspan><tspan class="cls-12" x="68.75" y="0">r</tspan><tspan x="71.9" y="0">a</tspan></text>
-    <text class="cls-8" transform="translate(28.29 561.37)"><tspan class="cls-9" x="0" y="0">N</tspan><tspan x="12.16" y="0">ome arti</tspan><tspan class="cls-11" x="73.55" y="0">s</tspan><tspan x="81.91" y="0">ta</tspan></text>
-    <path class="cls-7" d="M36.88,486.01c-2.44,2.92-4.93,3.23-8.59,3.23v-1.71c6.09,0,8.59-2.62,8.59-7.92h1.95v42.1h-1.95v-35.7Z"/>
-    <rect class="cls-7" x="167.38" y="479.61" width="194.33" height="242.91"/>
-    <text class="cls-4" transform="translate(28.29 643.28)"><tspan class="cls-3" x="0" y="0">V</tspan><tspan x="7.42" y="0">alo</tspan><tspan class="cls-2" x="24.32" y="0">r</tspan></text>
-  </g>
+  <text class="cls-6" transform="translate(28.29 599.31)"><tspan class="cls-15" x="0" y="0">N</tspan><tspan x="10.68" y="0">ome ob</tspan><tspan class="cls-10" x="60.26" y="0">r</tspan><tspan x="64.95" y="0">a</tspan></text>
+  <text class="cls-4" transform="translate(28.29 616.86)"><tspan x="0" y="0">Ano ob</tspan><tspan class="cls-13" x="41.05" y="0">r</tspan><tspan x="45.15" y="0">a</tspan></text>
+  <text class="cls-5" transform="translate(28.29 671.19)"><tspan class="cls-1" x="0" y="0">T</tspan><tspan x="5.14" y="0">ecnica ob</tspan><tspan class="cls-14" x="51.66" y="0">r</tspan><tspan x="54.81" y="0">a</tspan></text>
+  <text class="cls-5" transform="translate(28.29 685.04)"><tspan x="0" y="0">Dimensoes ob</tspan><tspan class="cls-12" x="68.75" y="0">r</tspan><tspan x="71.9" y="0">a</tspan></text>
+  <text class="cls-8" transform="translate(28.29 561.37)"><tspan class="cls-9" x="0" y="0">N</tspan><tspan x="12.16" y="0">ome arti</tspan><tspan class="cls-11" x="73.55" y="0">s</tspan><tspan x="81.91" y="0">ta</tspan></text>
+  <path class="cls-7" d="M36.88,486.01c-2.44,2.92-4.93,3.23-8.59,3.23v-1.71c6.09,0,8.59-2.62,8.59-7.92h1.95v42.1h-1.95v-35.7Z"/>
+  <text class="cls-4" transform="translate(28.29 643.28)"><tspan class="cls-3" x="0" y="0">V</tspan><tspan x="7.42" y="0">alo</tspan><tspan class="cls-2" x="24.32" y="0">r</tspan></text>
   <path class="cls-7" d="M32.34,718.18v-8.25h.37v8.25h-.37Z"/>
   <path class="cls-7" d="M38.71,714v4.18h-.35v-4.18c0-.72-.3-1.5-1.55-1.5s-2.13,1.11-2.13,1.86v3.82h-.35v-5.88h.35v1.15h.02c.37-.65,1.04-1.25,2.19-1.25,1,0,1.81.6,1.81,1.8Z"/>
   <path class="cls-7" d="M44.61,709.93h.35v8.25h-.35v-1.48h-.02c-.33.85-1.1,1.6-2.32,1.6-1.34,0-2.44-1.13-2.44-3.07s1.11-3.03,2.46-3.03c1.21,0,1.96.73,2.31,1.64h.02v-3.91ZM44.61,715.24c0-1.7-1.05-2.73-2.26-2.73s-2.16,1.04-2.16,2.73.9,2.77,2.16,2.77,2.26-1.04,2.26-2.77Z"/>
