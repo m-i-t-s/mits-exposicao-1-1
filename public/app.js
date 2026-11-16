@@ -43,7 +43,7 @@
     }catch(error){state.online=false;state.lastError=error.message;console.warn('API não disponível:',error.message);return false;}
   }
   async function loadSvg(name,target){
-    const response=await fetch(`/assets/${name}`,{cache:'force-cache'});
+    const response=await fetch(`/assets/${name}?rev=20261114-sem-fundo-v2`,{cache:'no-store'});
     if(!response.ok)throw Error(`SVG não encontrado: ${name}`);
     const documentSvg=new DOMParser().parseFromString(await response.text(),'image/svg+xml');
     if(documentSvg.querySelector('parsererror'))throw Error(`SVG inválido: ${name}`);
@@ -90,7 +90,12 @@
       'data-artwork-image':String(entry.id)
     });
     image.setAttribute('href',`/api/image/${entry.id}?v=${encodeURIComponent(entry.imageUpdatedAt)}`);
-    // A imagem fica na camada de conteúdo, sem qualquer retângulo de apoio.
+    // A área é transparente. Se a imagem salva não carregar, não exibir
+    // placeholder, retângulo preto ou fundo auxiliar no SVG.
+    image.addEventListener('error',()=>{
+      console.error(`[MITS] A fotografia da obra ${entry.id} não carregou. Verifique /api/image/${entry.id}.`);
+      msg(`Foto da obra ${entry.id} indisponível. Confira o envio no painel administrativo.`);
+    });
     svg.append(image);
   }
   function addStatus(svg,entry,mobile){
@@ -192,7 +197,7 @@
       const svg=await loadSvg(file,target);
       if(target.dataset.token!==token)return;
       updateSvgWork(svg,entry);
-    }catch(error){console.error(error);msg(error.message);}
+    }catch(error){target.dataset.token='';console.error(error);msg(error.message);}
     document.title=`${entry.id}. ${entry.artist} — 1:1 | MITS`;
     $('#position').value=String(entry.id);
     $$('.map-hit').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.id)===entry.id)));
@@ -203,7 +208,7 @@
     if(target.dataset.source===file && target.querySelector('svg'))return;
     target.dataset.source=file;
     try{await loadSvg(file,target);if(target.dataset.source===file)renderCapaContent();}
-    catch(error){console.error(error);msg(error.message);}
+    catch(error){target.dataset.source='';console.error(error);msg(error.message);}
   }
   function renderCapaContent(){
     const svg=$('#home-art svg');if(!svg)return;

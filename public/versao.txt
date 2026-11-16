@@ -1,0 +1,3 @@
+MITS 1:1 | Correção do cache dos SVGs | 2026-11-14-v2
+Os SVGs são carregados sem usar force-cache.
+Área sem fotografia = sem retângulo/sem fundo de imagem.
