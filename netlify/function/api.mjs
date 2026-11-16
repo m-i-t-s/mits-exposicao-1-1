@@ -60,7 +60,7 @@ async function save(request){
   let imageUpdatedAt=null;
   if(!w.removeImage && w.imageUpdatedAt!=null){
    if(typeof w.imageUpdatedAt!=='string'|| !/^[a-z0-9-]{10,80}$/.test(w.imageUpdatedAt))return fail('Identificador de imagem inválido.');
-   const meta=await images().getMetadata(`artwork-${id}/${w.imageUpdatedAt}`);
+   const meta=await images().getMetadata(`artwork-${id}/${w.imageUpdatedAt}`,{consistency:'strong'});
    if(!meta)return fail('Imagem não encontrada. Reenvie a fotografia.');
    imageUpdatedAt=w.imageUpdatedAt;
   }
