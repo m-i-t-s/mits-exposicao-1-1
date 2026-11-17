@@ -70,11 +70,30 @@
     document.fonts?.ready?.then(()=>requestAnimationFrame(update));
   }
   function changeText(svg,placeholder,value,limit,minSize){
-    const target=[...svg.querySelectorAll('text')].find(t=>normalize(t.textContent)===normalize(placeholder));
-    if(!target)return;
-    target.textContent=String(value||placeholder);
-    fitText(target,limit,minSize);
+  const target = [...svg.querySelectorAll('text')].find(
+    t => normalize(t.textContent) === normalize(placeholder)
+  );
+
+  if (!target) return;
+
+  target.textContent = String(value ?? '').trim() || placeholder;
+
+  target.removeAttribute('textLength');
+  target.removeAttribute('lengthAdjust');
+  target.style.removeProperty('font-size');
+
+  // Mantém os tamanhos originais definidos no SVG.
+  // Apenas técnica e dimensões podem ter autoajuste.
+  const autoFit = [
+    'tecnica obra',
+    'dimensoes obra'
+  ].includes(normalize(placeholder));
+
+  if (autoFit) {
+    fitText(target, limit, minSize);
   }
+}
+
   function addPhoto(svg,entry,mobile){
     // O retângulo de referência foi REMOVIDO dos SVGs finais pela designer.
     // Mantemos exatamente a posição e o tamanho anteriores como área
